@@ -10,9 +10,9 @@ SimpleJetCorrectionUncertainty::SimpleJetCorrectionUncertainty ()
   mParameters = new JetCorrectorParameters();
 }
 /////////////////////////////////////////////////////////////////////////
-SimpleJetCorrectionUncertainty::SimpleJetCorrectionUncertainty(const std::string& fDataFile)  
+SimpleJetCorrectionUncertainty::SimpleJetCorrectionUncertainty(const std::string& fDataFile, const std::string& fOption)  
 {
-  mParameters = new JetCorrectorParameters(fDataFile);
+  mParameters = new JetCorrectorParameters(fDataFile,fOption);
 }
 /////////////////////////////////////////////////////////////////////////
 SimpleJetCorrectionUncertainty::SimpleJetCorrectionUncertainty(const JetCorrectorParameters& fParameters)  

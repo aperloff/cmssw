@@ -1,6 +1,7 @@
 <lcgdict>
 <selection>
   <class name="FactorizedJetCorrector"/>
+  <class name="FactorizedJetCorrectionUncertainty"/>
   <class name="JetCorrectionUncertainty"/>
   <class name="JetCorrectorParameters">
     <field name="helper"                  transient="true"/>

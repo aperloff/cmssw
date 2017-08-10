@@ -11,7 +11,7 @@ class SimpleJetCorrectionUncertainty
 {
  public:
   SimpleJetCorrectionUncertainty();
-  SimpleJetCorrectionUncertainty(const std::string& fDataFile);
+  SimpleJetCorrectionUncertainty(const std::string& fDataFile, const std::string& fOption = "");
   SimpleJetCorrectionUncertainty(const JetCorrectorParameters& fParameters);
   ~SimpleJetCorrectionUncertainty();
   const JetCorrectorParameters& parameters() const {return *mParameters;}
