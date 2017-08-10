@@ -24,8 +24,8 @@ FactorizedJetCorrectionUncertainty::FactorizedJetCorrectionUncertainty()
 //------------------------------------------------------------------------
 //--- FactorizedJetCorrectionUncertainty constructor ---------------------------------
 //------------------------------------------------------------------------
-FactorizedJetCorrectionUncertainty::FactorizedJetCorrectionUncertainty(const std::string& fLevels, const std::string& fFiles, const std::string& fOptions):
-mCalc(fLevels,fFiles,fOptions)
+FactorizedJetCorrectionUncertainty::FactorizedJetCorrectionUncertainty(const std::string& fLevels, const std::string& fFiles):
+mCalc(fLevels,fFiles)
 {
 }
 //------------------------------------------------------------------------

@@ -64,7 +64,7 @@ void FactorizedJetCorrectionUncertaintyCalculator::initCorrectors(const std::str
   std::vector<std::string> tmp = parseLevels(removeSpaces(fLevels));
   for(unsigned i=0;i<tmp.size();i++) {
     try{
-      mLevels.push_back(JetCorrectionUncertaintyCollection::findKey(tmp[i]));
+      mLevels.push_back(findKey(tmp[i]));
     }
     catch (const cms::Exception& e) {
       std::stringstream sserr;
@@ -128,6 +128,78 @@ std::vector<FactorizedJetCorrectionUncertaintyCalculator::VarTypes> FactorizedJe
     }
   }
   return result;
+}
+//------------------------------------------------------------------------
+//--- Mapping between level names and level types ------------------------
+//------------------------------------------------------------------------
+namespace {
+const std::vector<std::string> levels_ = {
+     "AbsoluteStat",
+     "AbsoluteScale",
+     "AbsoluteFlavMap",
+     "AbsoluteMPFBias",
+     "Fragmentation",
+     "SinglePionECAL",
+     "SinglePionHCAL",
+     "FlavorQCD",
+     "TimePtEta",
+     "RelativeJEREC1",
+     "RelativeJEREC2",
+     "RelativeJERHF",
+     "RelativePtBB",
+     "RelativePtEC1",
+     "RelativePtEC2",
+     "RelativePtHF",
+     "RelativeBal",
+     "RelativeFSR",
+     "RelativeStatFSR",
+     "RelativeStatEC",
+     "RelativeStatHF",
+     "PileUpDataMC",
+     "PileUpPtRef",
+     "PileUpPtBB",
+     "PileUpPtEC1",
+     "PileUpPtEC2",
+     "PileUpPtHF",
+     "PileUpMuZero",
+     "PileUpEnvelope",
+     "SubTotalPileUp",
+     "SubTotalRelative",
+     "SubTotalPt",
+     "SubTotalScale",
+     "SubTotalAbsolute",
+     "SubTotalMC",
+     "Total",
+     "TotalNoFlavor",
+     "TotalNoTime",
+     "TotalNoFlavorNoTime",
+     "FlavorZJet",
+     "FlavorPhotonJet",
+     "FlavorPureGluon",
+     "FlavorPureQuark",
+     "FlavorPureCharm",
+     "FlavorPureBottom",
+     "TimeRunBCD",
+     "TimeRunEF",
+     "TimeRunG",
+     "TimeRunH",
+     "CorrelationGroupMPFInSitu",
+     "CorrelationGroupIntercalibration",
+     "CorrelationGroupbJES",
+     "CorrelationGroupFlavor",
+     "CorrelationGroupUncorrelated"
+ };
+}
+FactorizedJetCorrectionUncertaintyCalculator::LevelTypes FactorizedJetCorrectionUncertaintyCalculator::findKey( std::string const & level ) const {
+  // Check the default uncertainties
+  std::vector<std::string>::const_iterator found =
+    find( levels_.begin(), levels_.end(), level );
+  if ( found != levels_.end() ) {
+    return static_cast<FactorizedJetCorrectionUncertaintyCalculator::LevelTypes>(found - levels_.begin());
+  }
+
+  // Didn't find default uncertainties, throw exception
+  throw cms::Exception("InvalidInput") << " Cannot find level " << level << std::endl;
 }
 //------------------------------------------------------------------------
 //--- Consistency checker ------------------------------------------------

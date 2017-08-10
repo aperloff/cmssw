@@ -78,7 +78,7 @@ class FactorizedJetCorrectionUncertainty
      kCorrelationGroupUncorrelated
     };
     FactorizedJetCorrectionUncertainty();
-    FactorizedJetCorrectionUncertainty(const std::string& fLevels, const std::string& fTags, const std::string& fOptions="");
+    FactorizedJetCorrectionUncertainty(const std::string& fLevels, const std::string& fTags);
     FactorizedJetCorrectionUncertainty(const JetCorrectionUncertaintyCollection& fParameters);
 
     void setNPV		(int   fNPV);

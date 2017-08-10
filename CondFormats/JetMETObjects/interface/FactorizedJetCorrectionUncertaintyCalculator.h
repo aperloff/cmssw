@@ -155,6 +155,7 @@ class FactorizedJetCorrectionUncertaintyCalculator
     void checkConsistency(const std::vector<std::string>& fLevels, const std::vector<std::string>& fTags);
     std::vector<float> fillVector(const std::vector<VarTypes>& fVarTypes, const VariableValues&) const;
     std::vector<VarTypes> mapping(const std::vector<std::string>& fNames) const;
+    LevelTypes findKey( std::string const & level ) const;
     //---- Member Data ---------
     std::vector<LevelTypes> mLevels;
     std::vector<std::vector<VarTypes> > mParTypes,mBinTypes; 
