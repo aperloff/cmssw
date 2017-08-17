@@ -9,7 +9,7 @@
   </class>
   <ioread sourceClass="JetCorrectorParameters" targetClass="JetCorrectorParameters" version="[0-]" source="JetCorrectorParameters::Definitions mDefinitions; std::vector<JetCorrectorParameters::Record> mRecords;" target="helper">
     <![CDATA[
-         newObj->init(); 
+         newObj->init();
     ]]>
   </ioread>
   <class name="JetCorrectorParametersCollection"/>
@@ -20,8 +20,14 @@
   <class name="std::vector<JetCorrectorParameters>"/>
   <class name="std::vector<JetCorrectorParameters::Record>"/>
   <class name="std::vector<JetCorrectorParametersCollection>"/>
-  <class name="SimpleJetCorrectionUncertainty"/>
+  <class name="JetCorrectionUncertaintyCollection"/>
+  <class name="JetCorrectionUncertaintyCollection::label_type"/>
+  <class name="JetCorrectionUncertaintyCollection::value_type"/>
+  <class name="JetCorrectionUncertaintyCollection::collection_type"/>
+  <class name="JetCorrectionUncertaintyCollection::pair_type"/>
+  <class name="std::vector<JetCorrectionUncertaintyCollection>"/>
   <class name="SimpleJetCorrector"/>
+  <class name="SimpleJetCorrectionUncertainty"/>
   <class name="FFTJetCorrectorParameters" class_version="0">
      <field name="m_buffer" mapping="blob"/>
   </class>
@@ -33,14 +39,14 @@
   </class>
 
   <class name="QGLikelihoodObject::Entry"/>
-  <class name="std::vector<QGLikelihoodObject::Entry>"/>     
+  <class name="std::vector<QGLikelihoodObject::Entry>"/>
 
   <class name="QGLikelihoodSystematicsObject" class_version="0">
      <field name="data" mapping="blob"/>
   </class>
 
   <class name="QGLikelihoodSystematicsObject::Entry"/>
-  <class name="std::vector<QGLikelihoodSystematicsObject::Entry>"/>     
+  <class name="std::vector<QGLikelihoodSystematicsObject::Entry>"/>
 
   <class name="METCorrectorParameters"/>
   <class name="MEtXYcorrectParameters"/>

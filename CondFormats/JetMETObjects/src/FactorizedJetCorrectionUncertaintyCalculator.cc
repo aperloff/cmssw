@@ -31,7 +31,7 @@ FactorizedJetCorrectionUncertaintyCalculator::FactorizedJetCorrectionUncertainty
 //------------------------------------------------------------------------
 //--- FactorizedJetCorrectionUncertaintyCalculator constructor ---------------------------------
 //------------------------------------------------------------------------
-FactorizedJetCorrectionUncertaintyCalculator::FactorizedJetCorrectionUncertaintyCalculator(const JetCorrectionUncertaintyCollection& fParameters)
+FactorizedJetCorrectionUncertaintyCalculator::FactorizedJetCorrectionUncertaintyCalculator(const JetCorrectionUncertaintyCollection& fParameters)//changed from JetCorrectionUncertaintyCollection
 {
   std::vector<int> keys;
   fParameters.validKeys(keys);
@@ -41,7 +41,8 @@ FactorizedJetCorrectionUncertaintyCalculator::FactorizedJetCorrectionUncertainty
       sserr<<"unknown correction level "<<i;
       handleError("FactorizedJetCorrectionUncertaintyCalculator",sserr.str());
     }
-    mCorrectors.push_back(new SimpleJetCorrectionUncertainty(fParameters[i]));
+    //mCorrectors.push_back(new SimpleJetCorrectionUncertainty(fParameters[i]));
+    mCorrectors.push_back(fParameters[i].getSimpleJetCorrectionUncertainty());
     mBinTypes.push_back(mapping(mCorrectors[i]->parameters().definitions().binVar()));
     mParTypes.push_back(mapping(mCorrectors[i]->parameters().definitions().parVar()));
   }
@@ -301,6 +302,69 @@ float FactorizedJetCorrectionUncertaintyCalculator::getUncertainty(FactorizedJet
 //------------------------------------------------------------------------
 std::vector<float> FactorizedJetCorrectionUncertaintyCalculator::getSubUncertainties( FactorizedJetCorrectionUncertaintyCalculator::VariableValues& iValues) const
 {
+  /**
+  //get the JEC uncertainties
+  edm::ESHandle<JetCorrectionUncertaintyCollection> jcuc;
+  //iSetup.get<JetCorrectionsRecord>().get(JetType_,JetCorParColl);
+  JetCorrectionUncertainty const & jcu = (*jcuc)["Uncertainty"];
+  auto jecUnc = std::make_unique<JetCorrectionUncertainty>(jcu);
+
+  //get the input jet collection (nominal JECs already applied)
+  edm::Handle<edm::View<pat::Jet>> jets;
+  iEvent.getByToken(JetTok_, jets);
+
+  auto newJets  = std::make_unique<std::vector<pat::Jet>>();
+  newJets->reserve(jets->size());
+  auto jecUncVec  = std::make_unique<std::vector<double>>();
+  jecUncVec->reserve(jets->size());
+
+//loop over all jets
+  for (edm::View<pat::Jet>::const_iterator itJet = jets->begin(); itJet != jets->end(); itJet++) {
+     // construct the Jet from the ref -> save ref to original object
+     unsigned int idx = std::distance(jets->begin(),itJet);
+     edm::RefToBase<pat::Jet> jetRef = jets->refAt(idx);
+     edm::Ptr<pat::Jet> jetPtr = jets->ptrAt(idx);
+     pat::Jet ajet(jetPtr);
+     math::XYZTLorentzVector vjet = ajet.p4();
+
+     //get JEC unc for this jet, using corrected pT
+     jecUnc->setJetEta(itJet->eta());
+     jecUnc->setJetPt(itJet->pt());
+     double uncertainty = jecUnc->getUncertainty(true);
+     //safety check if uncertainty is not available for a jet
+     if(uncertainty==-999.) uncertainty = 0;
+
+     double jesUncScale = 1.0;
+     //no variation - just store scale factor & uncertainty
+     if(jecUncDir_==0){
+        //store JEC unc for this jet
+        jecUncVec->push_back(uncertainty);
+        continue;
+     }
+     //downward variation
+     if(jecUncDir_ < 0){
+        jesUncScale = 1 - uncertainty;
+     }
+     //upward variation
+     else if(jecUncDir_ > 0){
+        jesUncScale = 1 + uncertainty;
+     }
+
+     //apply variation
+     vjet *= jesUncScale;
+
+     //set new p4 in jet object
+     ajet.setP4(vjet);
+
+     //store varied jet
+     newJets->push_back(ajet);
+  }
+  iValues.reset();
+  return newJets;
+**/
+
+
+  //Original shit
   float scale,factor;
   std::vector<float> factors;
   std::vector<float> vx,vy;
@@ -308,8 +372,7 @@ std::vector<float> FactorizedJetCorrectionUncertaintyCalculator::getSubUncertain
   for(unsigned int i=0;i<mLevels.size();i++) {
     vx = fillVector(mBinTypes[i],iValues);
     vy = fillVector(mParTypes[i],iValues);
-    //if (mLevels[i]==kL2 || mLevels[i]==kL6)
-      //mCorrectors[i]->setInterpolation(true);
+
     scale = mCorrectors[i]->uncertainty(vx,vy[0],true);
     iValues.mJetE  *= scale;
     iValues.mJetPt *= scale;
@@ -318,6 +381,7 @@ std::vector<float> FactorizedJetCorrectionUncertaintyCalculator::getSubUncertain
   }
   iValues.reset();
   return factors;
+
 }
 //------------------------------------------------------------------------
 //--- Reads the parameter names and fills a vector of floats -------------

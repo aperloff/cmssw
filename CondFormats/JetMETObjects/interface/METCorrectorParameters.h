@@ -11,27 +11,27 @@
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
-class METCorrectorParameters 
+class METCorrectorParameters
 {
   //---------------- METCorrectorParameters class ----------------
   //-- Encapsulates all the information of the parametrization ---
   public:
     //---------------- Definitions class ---------------------------
     //-- Global iformation about the parametrization is kept here --
-    class Definitions 
+    class Definitions
     {
       public:
-        //-------- Constructors -------------- 
+        //-------- Constructors --------------
         Definitions() {}
-        Definitions(const std::vector<std::string>& fVar, const std::vector<std::string>& fParVar, const std::string& fFormula); 
-        Definitions(const std::string& fLine); 
+        Definitions(const std::vector<std::string>& fVar, const std::vector<std::string>& fParVar, const std::string& fFormula);
+        Definitions(const std::string& fLine);
         //-------- Member functions ----------
         unsigned nBinVar()                  const {return mBinVar.size(); }
         unsigned nParVar()                  const {return mParVar.size(); }
         std::vector<std::string> parVar()   const {return mParVar;        }
-        std::vector<std::string> binVar()   const {return mBinVar;        } 
+        std::vector<std::string> binVar()   const {return mBinVar;        }
         std::string parVar(unsigned fIndex) const {return mParVar[fIndex];}
-        std::string binVar(unsigned fIndex) const {return mBinVar[fIndex];} 
+        std::string binVar(unsigned fIndex) const {return mBinVar[fIndex];}
         std::string formula()               const {return mFormula;       }
       private:
         //-------- Member variables ----------
@@ -43,8 +43,8 @@ class METCorrectorParameters
       COND_SERIALIZABLE;
     };
     //---------------- Record class --------------------------------
-    //-- Each Record holds the properties of a bin ----------------- 
-    class Record 
+    //-- Each Record holds the properties of a bin -----------------
+    class Record
     {
       public:
         //-------- Constructors --------------
@@ -73,7 +73,7 @@ class METCorrectorParameters
     METCorrectorParameters() { valid_ = false;}
     METCorrectorParameters(const std::string& fFile, const std::string& fSection = "");
     METCorrectorParameters(const METCorrectorParameters::Definitions& fDefinitions,
-			 const std::vector<METCorrectorParameters::Record>& fRecords) 
+			 const std::vector<METCorrectorParameters::Record>& fRecords)
       : mDefinitions(fDefinitions),mRecords(fRecords) { valid_ = true;}
     //-------- Member functions ----------
     const Record& record(unsigned fBin)                          const {return mRecords[fBin]; }
@@ -99,7 +99,8 @@ class METCorrectorParameters
 
 class METCorrectorParametersCollection {
  public:
-  enum Level_t { MiniAod=0,
+  enum Level_t {
+     MiniAod=0,
 		 N_LEVELS=1
   };
 
@@ -112,26 +113,26 @@ class METCorrectorParametersCollection {
   // Constructor... initialize all three vectors to zero
   METCorrectorParametersCollection() { correctionsMiniAod_.clear();}
 
-  // Add a METCorrectorParameter object, for each source 
+  // Add a METCorrectorParameter object, for each source
   void push_back( key_type i, value_type const & j, label_type const & source = "" );
 
   // Access the METCorrectorParameter via the key k.
   // key_type is hashed to deal with the three collections
   METCorrectorParameters const & operator[]( key_type k ) const;
 
-  // Access the METCorrectorParameter via a string. 
-  // Will find the hashed value for the label, and call via that 
-  // operator. 
+  // Access the METCorrectorParameter via a string.
+  // Will find the hashed value for the label, and call via that
+  // operator.
   METCorrectorParameters const & operator[]( std::string const & label ) const {
     return operator[]( findKey(label) );
   }
 
   // Get a list of valid keys. These will contain hashed keys
-  // that are aware of all three collections. 
+  // that are aware of all three collections.
   void validKeys(std::vector<key_type> & keys ) const;
 
 
-  // Helper method to find all of the sections in a given 
+  // Helper method to find all of the sections in a given
   // parameters file
   static void getSections( std::string inputFile,
 			   std::vector<std::string> & outputs );

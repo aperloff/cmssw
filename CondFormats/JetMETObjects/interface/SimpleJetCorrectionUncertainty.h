@@ -7,7 +7,7 @@
 #include <vector>
 class JetCorrectorParameters;
 
-class SimpleJetCorrectionUncertainty 
+class SimpleJetCorrectionUncertainty
 {
  public:
   SimpleJetCorrectionUncertainty();
@@ -24,7 +24,9 @@ class SimpleJetCorrectionUncertainty
   float uncertaintyBin(unsigned fBin, float fY, bool fDirection) const;
   float linearInterpolation (float fZ, const float fX[2], const float fY[2]) const;
   JetCorrectorParameters* mParameters;
+  
+  COND_SERIALIZABLE;
+
 };
 
 #endif
-

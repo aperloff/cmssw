@@ -8,29 +8,32 @@
 class SimpleJetCorrectionUncertainty;
 class JetCorrectorParameters;
 
-class JetCorrectionUncertainty 
+class JetCorrectionUncertainty
 {
   public:
     JetCorrectionUncertainty();
     JetCorrectionUncertainty(const std::string& fDataFile);
-    JetCorrectionUncertainty(const JetCorrectorParameters& fParameters);
+    JetCorrectionUncertainty(const JetCorrectorParameters& fParameters);//change???
     ~JetCorrectionUncertainty();
+
+    //JetCorrectionUncertainty(const JetCorrectionUncertainty&);
+    //JetCorrectionUncertainty& operator= (const JetCorrectionUncertainty&);
 
     void setParameters  (const std::string& fDataFile);
     void setJetEta      (float fEta);
-    void setJetPt       (float fPt); 
+    void setJetPt       (float fPt);
     void setJetE        (float fE);
     void setJetPhi      (float fE);
-    void setJetEMF      (float fEMF); 
+    void setJetEMF      (float fEMF);
     void setLepPx       (float fLepPx);
     void setLepPy       (float fLepPy);
     void setLepPz       (float fLepPz);
-    void setAddLepToJet (bool fAddLepToJet) {mAddLepToJet = fAddLepToJet;}
+    void setAddLepToJet (bool fAddLepToJet) { mAddLepToJet = fAddLepToJet; }
     float getUncertainty(bool fDirection);
+    SimpleJetCorrectionUncertainty const* getSimpleJetCorrectionUncertainty() const { return mUncertainty; }
 
  private:
-  JetCorrectionUncertainty(const JetCorrectionUncertainty&);
-  JetCorrectionUncertainty& operator= (const JetCorrectionUncertainty&);
+
   std::vector<float> fillVector(const std::vector<std::string>& fNames);
   float getPtRel();
   //---- Member Data ---------
@@ -38,7 +41,7 @@ class JetCorrectionUncertainty
   float mJetEta;
   float mJetPt;
   float mJetPhi;
-  float mJetEMF; 
+  float mJetEMF;
   float mLepPx;
   float mLepPy;
   float mLepPz;
@@ -47,11 +50,14 @@ class JetCorrectionUncertainty
   bool  mIsJetPtset;
   bool  mIsJetPhiset;
   bool  mIsJetEtaset;
-  bool  mIsJetEMFset; 
+  bool  mIsJetEMFset;
   bool  mIsLepPxset;
   bool  mIsLepPyset;
   bool  mIsLepPzset;
   SimpleJetCorrectionUncertainty* mUncertainty;
+
+  COND_SERIALIZABLE;
+
 };
 
 class JetCorrectionUncertaintyCollection {
@@ -94,7 +100,7 @@ class JetCorrectionUncertaintyCollection {
      SubTotalScale                    = 32,
      SubTotalAbsolute                 = 33,
      SubTotalMC                       = 34,
-     Total                            = 35,     
+     Total                            = 35,
      TotalNoFlavor                    = 36,
      TotalNoTime                      = 37,
      TotalNoFlavorNoTime              = 38,
@@ -118,7 +124,7 @@ class JetCorrectionUncertaintyCollection {
 
   typedef int                            key_type;
   typedef std::string                    label_type;
-  typedef JetCorrectorParameters         value_type;
+  typedef JetCorrectionUncertainty       value_type; //is this right? JetCorrectorParameters?
   typedef std::pair<key_type,value_type> pair_type;
   typedef std::vector<pair_type>         collection_type;
 
@@ -133,12 +139,12 @@ class JetCorrectionUncertaintyCollection {
 
   // Access the JetCorrectorParameter via the key k.
   // key_type is hashed to deal with the three collections
-  JetCorrectorParameters const & operator[]( key_type k ) const;
+  JetCorrectionUncertainty const & operator[]( key_type k ) const; //is this right?
 
   // Access the JetCorrectorParameter via a string.
   // Will find the hashed value for the label, and call via that
   // operator.
-  JetCorrectorParameters const & operator[]( std::string const & label ) const {
+  JetCorrectionUncertainty const & operator[]( std::string const & label ) const { //is this right?
     return operator[]( findKey(label) );
   }
 
@@ -168,4 +174,3 @@ class JetCorrectionUncertaintyCollection {
 };
 
 #endif
-

@@ -11,7 +11,7 @@
 #include <algorithm>
 
 /////////////////////////////////////////////////////////////////////////
-JetCorrectionUncertainty::JetCorrectionUncertainty () 
+JetCorrectionUncertainty::JetCorrectionUncertainty ()
 {
   mJetEta = -9999;
   mJetPt  = -9999;
@@ -33,7 +33,7 @@ JetCorrectionUncertainty::JetCorrectionUncertainty ()
   mUncertainty = new SimpleJetCorrectionUncertainty();
 }
 /////////////////////////////////////////////////////////////////////////
-JetCorrectionUncertainty::JetCorrectionUncertainty(const std::string& fDataFile)  
+JetCorrectionUncertainty::JetCorrectionUncertainty(const std::string& fDataFile)
 {
   mJetEta = -9999;
   mJetPt  = -9999;
@@ -55,7 +55,7 @@ JetCorrectionUncertainty::JetCorrectionUncertainty(const std::string& fDataFile)
   mUncertainty = new SimpleJetCorrectionUncertainty(fDataFile);
 }
 /////////////////////////////////////////////////////////////////////////
-JetCorrectionUncertainty::JetCorrectionUncertainty(const JetCorrectorParameters& fParameters)  
+JetCorrectionUncertainty::JetCorrectionUncertainty(const JetCorrectorParameters& fParameters)
 {
   mJetEta = -9999;
   mJetPt  = -9999;
@@ -77,19 +77,19 @@ JetCorrectionUncertainty::JetCorrectionUncertainty(const JetCorrectorParameters&
   mUncertainty = new SimpleJetCorrectionUncertainty(fParameters);
 }
 /////////////////////////////////////////////////////////////////////////
-JetCorrectionUncertainty::~JetCorrectionUncertainty () 
+JetCorrectionUncertainty::~JetCorrectionUncertainty ()
 {
   delete mUncertainty;
 }
 /////////////////////////////////////////////////////////////////////////
-void JetCorrectionUncertainty::setParameters(const std::string& fDataFile) 
+void JetCorrectionUncertainty::setParameters(const std::string& fDataFile)
 {
   //---- delete the mParameters pointer before setting the new address ---
-  delete mUncertainty; 
+  delete mUncertainty;
   mUncertainty = new SimpleJetCorrectionUncertainty(fDataFile);
 }
 /////////////////////////////////////////////////////////////////////////
-float JetCorrectionUncertainty::getUncertainty(bool fDirection) 
+float JetCorrectionUncertainty::getUncertainty(bool fDirection)
 {
   float result;
   std::vector<float> vx,vy;
@@ -106,7 +106,7 @@ float JetCorrectionUncertainty::getUncertainty(bool fDirection)
   mIsLepPzset  = false;
   return result;
 }
-//------------------------------------------------------------------------ 
+//------------------------------------------------------------------------
 //--- Reads the parameter names and fills a vector of floats -------------
 //------------------------------------------------------------------------
 std::vector<float> JetCorrectionUncertainty::fillVector(const std::vector<std::string>& fNames)
@@ -126,7 +126,7 @@ std::vector<float> JetCorrectionUncertainty::fillVector(const std::vector<std::s
       else if (fNames[i] == "JetPt")
         {
           if (!mIsJetPtset){
-	    edm::LogError("JetCorrectionUncertainty::")<<" jet pt is not set";  
+	    edm::LogError("JetCorrectionUncertainty::")<<" jet pt is not set";
 	    result.push_back(-999.0);
 	  } else {
 	    result.push_back(mJetPt);
@@ -135,7 +135,7 @@ std::vector<float> JetCorrectionUncertainty::fillVector(const std::vector<std::s
       else if (fNames[i] == "JetPhi")
         {
           if (!mIsJetPhiset) {
-	    edm::LogError("JetCorrectionUncertainty::")<<" jet phi is not set";  
+	    edm::LogError("JetCorrectionUncertainty::")<<" jet phi is not set";
 	    result.push_back(-999.0);
 	  } else {
 	    result.push_back(mJetPt);
@@ -158,7 +158,7 @@ std::vector<float> JetCorrectionUncertainty::fillVector(const std::vector<std::s
 	  } else {
 	    result.push_back(mJetEMF);
 	  }
-        } 
+        }
       else if (fNames[i] == "LepPx")
         {
           if (!mIsLepPxset){
@@ -186,15 +186,15 @@ std::vector<float> JetCorrectionUncertainty::fillVector(const std::vector<std::s
 	    result.push_back(mLepPz);
 	  }
         }
-     
+
       else {
 	edm::LogError("JetCorrectionUncertainty::")<<" unknown parameter "<<fNames[i];
 	result.push_back(-999.0);
       }
-    }     
-  return result;      
+    }
+  return result;
 }
-//------------------------------------------------------------------------ 
+//------------------------------------------------------------------------
 //--- Calculate the PtRel (needed for the SLB) ---------------------------
 //------------------------------------------------------------------------
 float JetCorrectionUncertainty::getPtRel()
@@ -226,7 +226,7 @@ float JetCorrectionUncertainty::getPtRel()
     edm::LogError("JetCorrectionUncertainty")<<" not positive lepton-jet momentum: "<<lj2;
   return (pTrel2 > 0) ? std::sqrt(pTrel2) : 0.0;
 }
-//------------------------------------------------------------------------ 
+//------------------------------------------------------------------------
 //--- Setters ------------------------------------------------------------
 //------------------------------------------------------------------------
 void JetCorrectionUncertainty::setJetEta(float fEta)
@@ -339,7 +339,7 @@ const std::vector<std::string> labels_ = {
 JetCorrectionUncertaintyCollection::JetCorrectionUncertaintyCollection( std::string inputTxtFile, std::vector<label_type> chosen_sections ) {
   uncertainties_.clear();
   for(auto cs : chosen_sections) {
-    push_back(findKey(cs),JetCorrectorParameters(inputTxtFile,cs));
+    push_back(findKey(cs),JetCorrectionUncertainty(JetCorrectorParameters(inputTxtFile,cs)));
   }
   std::sort(uncertainties_.begin(),uncertainties_.end(),[ ]( const auto& lhs, const auto& rhs)
   {
@@ -380,7 +380,7 @@ void JetCorrectionUncertaintyCollection::push_back( key_type i, value_type const
 //------------------------------------------------------------------------
 // Access the JetCorrectorParameter via the key k.
 // key_type is hashed to deal with the three collections
-JetCorrectorParameters const & JetCorrectionUncertaintyCollection::operator[]( key_type k ) const {
+JetCorrectionUncertainty const & JetCorrectionUncertaintyCollection::operator[]( key_type k ) const {
   collection_type::const_iterator ibegin = uncertainties_.begin(), iend = uncertainties_.end(), i = ibegin;
   for ( ; i != iend; ++i ) {
     if ( k == i->first ) return i->second;
