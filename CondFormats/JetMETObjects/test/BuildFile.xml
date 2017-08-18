@@ -6,3 +6,6 @@
      <use name="CondFormats/JetMETObjects"/>
      <use name="cppunit"/>
 </bin>
+<bin name="TestUncertaintySources" file="TestUncertaintySources.cpp">
+    <use name="CondFormats/JetMETObjects"/>
+</bin>
