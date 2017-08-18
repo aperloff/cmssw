@@ -2,21 +2,21 @@
 #define JetCorrectionUncertainty_h
 
 #include "CondFormats/Serialization/interface/Serializable.h"
+#include "CondFormats/JetMETObjects/interface/SimpleJetCorrectionUncertainty.h"
 
 #include <string>
 #include <vector>
-class SimpleJetCorrectionUncertainty;
-class JetCorrectorParameters;
+//class SimpleJetCorrectionUncertainty;
 
 class JetCorrectionUncertainty
 {
   public:
     JetCorrectionUncertainty();
-    JetCorrectionUncertainty(const std::string& fDataFile);
+    JetCorrectionUncertainty(const std::string& fDataFile, const std::string& fSection = "");
     JetCorrectionUncertainty(const JetCorrectorParameters& fParameters);//change???
     ~JetCorrectionUncertainty();
 
-    //JetCorrectionUncertainty(const JetCorrectionUncertainty&);
+    JetCorrectionUncertainty(const JetCorrectionUncertainty& rhs);
     //JetCorrectionUncertainty& operator= (const JetCorrectionUncertainty&);
 
     void setParameters  (const std::string& fDataFile);
@@ -160,7 +160,7 @@ class JetCorrectionUncertaintyCollection {
   // Find the label corresponding to each key
   static std::string findLabel( key_type k );
 
-  const collection_type& getUncertainties() const  {return uncertainties_;}
+  const collection_type& getUncertainties() const {return uncertainties_;}
 
  protected:
 

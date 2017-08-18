@@ -1,34 +1,17 @@
 #include "CondFormats/JetMETObjects/interface/SimpleJetCorrectionUncertainty.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include <vector>
 #include <string>
 
 /////////////////////////////////////////////////////////////////////////
-SimpleJetCorrectionUncertainty::SimpleJetCorrectionUncertainty () 
-{
-  mParameters = new JetCorrectorParameters();
-}
+SimpleJetCorrectionUncertainty::SimpleJetCorrectionUncertainty(const std::string& fDataFile, const std::string& fOption) : mParameters(fDataFile,fOption) {}
 /////////////////////////////////////////////////////////////////////////
-SimpleJetCorrectionUncertainty::SimpleJetCorrectionUncertainty(const std::string& fDataFile, const std::string& fOption)  
-{
-  mParameters = new JetCorrectorParameters(fDataFile,fOption);
-}
-/////////////////////////////////////////////////////////////////////////
-SimpleJetCorrectionUncertainty::SimpleJetCorrectionUncertainty(const JetCorrectorParameters& fParameters)  
-{
-  mParameters = new JetCorrectorParameters(fParameters);
-}
-/////////////////////////////////////////////////////////////////////////
-SimpleJetCorrectionUncertainty::~SimpleJetCorrectionUncertainty () 
-{
-  delete mParameters;
-}
+SimpleJetCorrectionUncertainty::SimpleJetCorrectionUncertainty(const JetCorrectorParameters& fParameters) : mParameters(fParameters) {}
 /////////////////////////////////////////////////////////////////////////
 float SimpleJetCorrectionUncertainty::uncertainty(const std::vector<float>& fX, float fY, bool fDirection) const 
 {
   float result = 1.;
-  int bin = mParameters->binIndex(fX);
+  int bin = mParameters.binIndex(fX);
   if (bin<0) {
     edm::LogError("SimpleJetCorrectionUncertainty")<<" bin variables out of range";
     result = -999.0;
@@ -39,11 +22,11 @@ float SimpleJetCorrectionUncertainty::uncertainty(const std::vector<float>& fX, 
 /////////////////////////////////////////////////////////////////////////
 float SimpleJetCorrectionUncertainty::uncertaintyBin(unsigned fBin, float fY, bool fDirection) const 
 {
-  if (fBin >= mParameters->size()) { 
-    edm::LogError("SimpleJetCorrectionUncertainty")<<" wrong bin: "<<fBin<<": only "<<mParameters->size()<<" are available";
+  if (fBin >= mParameters.size()) { 
+    edm::LogError("SimpleJetCorrectionUncertainty")<<" wrong bin: "<<fBin<<": only "<<mParameters.size()<<" are available";
     return -999.0;
   }
-  const std::vector<float>& p = mParameters->record(fBin).parameters();
+  const std::vector<float>& p = mParameters.record(fBin).parameters();
   if ((p.size() % 3) != 0)
     throw cms::Exception ("SimpleJetCorrectionUncertainty")<<"wrong # of parameters: multiple of 3 expected, "<<p.size()<< " got";
   std::vector<float> yGrid,value;

@@ -133,10 +133,10 @@ class FactorizedJetCorrectionUncertaintyCalculator
      kCorrelationGroupFlavor,
      kCorrelationGroupUncorrelated
     };
-    FactorizedJetCorrectionUncertaintyCalculator();
+    FactorizedJetCorrectionUncertaintyCalculator() {}
     FactorizedJetCorrectionUncertaintyCalculator(const std::string& fLevels, const std::string& fTags);
     FactorizedJetCorrectionUncertaintyCalculator(const JetCorrectionUncertaintyCollection& fParameters);
-    ~FactorizedJetCorrectionUncertaintyCalculator();
+    ~FactorizedJetCorrectionUncertaintyCalculator() {}
     float getUncertainty(VariableValues&) const;
     std::vector<float> getSubUncertainties(VariableValues&) const;
     

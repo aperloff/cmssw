@@ -33,7 +33,7 @@ JetCorrectionUncertainty::JetCorrectionUncertainty ()
   mUncertainty = new SimpleJetCorrectionUncertainty();
 }
 /////////////////////////////////////////////////////////////////////////
-JetCorrectionUncertainty::JetCorrectionUncertainty(const std::string& fDataFile)
+JetCorrectionUncertainty::JetCorrectionUncertainty(const std::string& fDataFile, const std::string& fSection)
 {
   mJetEta = -9999;
   mJetPt  = -9999;
@@ -52,7 +52,7 @@ JetCorrectionUncertainty::JetCorrectionUncertainty(const std::string& fDataFile)
   mIsLepPyset  = false;
   mIsLepPzset  = false;
   mAddLepToJet = false;
-  mUncertainty = new SimpleJetCorrectionUncertainty(fDataFile);
+  mUncertainty = new SimpleJetCorrectionUncertainty(fDataFile,fSection);
 }
 /////////////////////////////////////////////////////////////////////////
 JetCorrectionUncertainty::JetCorrectionUncertainty(const JetCorrectorParameters& fParameters)
@@ -80,6 +80,28 @@ JetCorrectionUncertainty::JetCorrectionUncertainty(const JetCorrectorParameters&
 JetCorrectionUncertainty::~JetCorrectionUncertainty ()
 {
   delete mUncertainty;
+}
+/////////////////////////////////////////////////////////////////////////
+JetCorrectionUncertainty::JetCorrectionUncertainty(const JetCorrectionUncertainty& rhs)
+{
+  mJetE = rhs.mJetE;
+  mJetEta = rhs.mJetEta;
+  mJetPt = rhs.mJetPt;
+  mJetPhi = rhs.mJetPhi;
+  mJetEMF = rhs.mJetEMF;
+  mLepPx = rhs.mLepPx;
+  mLepPy = rhs.mLepPy;
+  mLepPz = rhs.mLepPz;
+  mAddLepToJet = rhs.mAddLepToJet;
+  mIsJetEset = rhs.mIsJetEset;
+  mIsJetPtset = rhs.mIsJetPtset;
+  mIsJetPhiset = rhs.mIsJetPhiset;
+  mIsJetEtaset = rhs.mIsJetEtaset;
+  mIsJetEMFset = rhs.mIsJetEMFset;
+  mIsLepPxset = rhs.mIsLepPxset;
+  mIsLepPyset = rhs.mIsLepPyset;
+  mIsLepPzset = rhs.mIsLepPzset;
+  mUncertainty = new SimpleJetCorrectionUncertainty(*rhs.mUncertainty);
 }
 /////////////////////////////////////////////////////////////////////////
 void JetCorrectionUncertainty::setParameters(const std::string& fDataFile)
@@ -339,7 +361,7 @@ const std::vector<std::string> labels_ = {
 JetCorrectionUncertaintyCollection::JetCorrectionUncertaintyCollection( std::string inputTxtFile, std::vector<label_type> chosen_sections ) {
   uncertainties_.clear();
   for(auto cs : chosen_sections) {
-    push_back(findKey(cs),JetCorrectionUncertainty(JetCorrectorParameters(inputTxtFile,cs)));
+    push_back(findKey(cs),JetCorrectionUncertainty(inputTxtFile,cs));
   }
   std::sort(uncertainties_.begin(),uncertainties_.end(),[ ]( const auto& lhs, const auto& rhs)
   {
@@ -375,7 +397,7 @@ void JetCorrectionUncertaintyCollection::getSections(std::string inputFile,
 // Add a JetCorrectorParameter object, possibly with flavor.
 void JetCorrectionUncertaintyCollection::push_back( key_type i, value_type const & j) {
   std::cout << "i    = " << i << std::endl;
-  uncertainties_.push_back( pair_type(i,j) );
+  uncertainties_.emplace_back(i,j);
 }
 //------------------------------------------------------------------------
 // Access the JetCorrectorParameter via the key k.

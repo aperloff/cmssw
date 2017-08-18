@@ -16,12 +16,6 @@
 #include <sstream>
 
 //------------------------------------------------------------------------
-//--- Default FactorizedJetCorrectionUncertaintyCalculator constructor -------------------------
-//------------------------------------------------------------------------
-FactorizedJetCorrectionUncertaintyCalculator::FactorizedJetCorrectionUncertaintyCalculator()
-{
-}
-//------------------------------------------------------------------------
 //--- FactorizedJetCorrectionUncertaintyCalculator constructor ---------------------------------
 //------------------------------------------------------------------------
 FactorizedJetCorrectionUncertaintyCalculator::FactorizedJetCorrectionUncertaintyCalculator(const std::string& fLevels, const std::string& fFiles)
@@ -48,14 +42,6 @@ FactorizedJetCorrectionUncertaintyCalculator::FactorizedJetCorrectionUncertainty
   }
 }
 
-//------------------------------------------------------------------------
-//--- FactorizedJetCorrectionUncertaintyCalculator destructor ----------------------------------
-//------------------------------------------------------------------------
-FactorizedJetCorrectionUncertaintyCalculator::~FactorizedJetCorrectionUncertaintyCalculator()
-{
-  for(unsigned i=0;i<mCorrectors.size();i++)
-    delete mCorrectors[i];
-}
 //------------------------------------------------------------------------
 //--- initialises the correctors -----------------------------------------
 //------------------------------------------------------------------------
