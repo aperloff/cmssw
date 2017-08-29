@@ -1,4 +1,4 @@
-// This is the header file "FactorizedJetCorrectionUncertaintyCalculator.h". This is the interface for the 
+// This is the header file "FactorizedJetCorrectionUncertaintyCalculator.h". This is the interface for the
 // class FactorizedJetCorrectionUncertaintyCalculator.
 // Author: Alexx Perloff, Emily MacDonald
 // Email:  alexx.stephen.perloff@cern.ch, emacdonald16@tamu.edu
@@ -27,10 +27,10 @@ class FactorizedJetCorrectionUncertaintyCalculator
       VariableValues();
       void setNPV		(int   fNPV);
       void setJetEta      (float fEta);
-      void setJetPt       (float fPt); 
+      void setJetPt       (float fPt);
       void setJetE        (float fE);
       void setJetPhi      (float fE);
-      void setJetEMF      (float fEMF); 
+      void setJetEMF      (float fEMF);
       void setJetA        (float fA);
       void setRho         (float fRho);
       void setJPTrawP4    (const TLorentzVector& fJPTrawP4);
@@ -48,13 +48,13 @@ class FactorizedJetCorrectionUncertaintyCalculator
       float mJetEta;
       float mJetPt;
       float mJetPhi;
-      float mJetEMF; 
+      float mJetEMF;
       float mJetA;
       float mRho;
       float mJPTrawE;
       float mJPTrawEt;
       float mJPTrawPt;
-      float mJPTrawEta; 
+      float mJPTrawEta;
       float mJPTrawOff;
       float mLepPx;
       float mLepPy;
@@ -65,7 +65,7 @@ class FactorizedJetCorrectionUncertaintyCalculator
       bool  mIsJetPtset;
       bool  mIsJetPhiset;
       bool  mIsJetEtaset;
-      bool  mIsJetEMFset; 
+      bool  mIsJetEMFset;
       bool  mIsJetAset;
       bool  mIsRhoset;
       bool  mIsJPTrawP4set;
@@ -138,11 +138,12 @@ class FactorizedJetCorrectionUncertaintyCalculator
     FactorizedJetCorrectionUncertaintyCalculator(const JetCorrectionUncertaintyCollection& fParameters);
     ~FactorizedJetCorrectionUncertaintyCalculator() {}
     float getUncertainty(VariableValues&) const;
-    std::vector<float> getSubUncertainties(VariableValues&) const;
-    
-       
+    //was std::vector<float>
+    float getSubUncertainties(VariableValues&) const;
+
+
   private:
-  //---- Member Functions ----  
+  //---- Member Functions ----
     FactorizedJetCorrectionUncertaintyCalculator(const FactorizedJetCorrectionUncertaintyCalculator&);
     FactorizedJetCorrectionUncertaintyCalculator& operator= (const FactorizedJetCorrectionUncertaintyCalculator&);
     float getLepPt(const VariableValues&)    const;
@@ -158,7 +159,7 @@ class FactorizedJetCorrectionUncertaintyCalculator
     LevelTypes findKey( std::string const & level ) const;
     //---- Member Data ---------
     std::vector<LevelTypes> mLevels;
-    std::vector<std::vector<VarTypes> > mParTypes,mBinTypes; 
+    std::vector<std::vector<VarTypes> > mParTypes,mBinTypes;
     std::vector<SimpleJetCorrectionUncertainty const*> mCorrectors;
 };
 #endif

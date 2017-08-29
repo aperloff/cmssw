@@ -1,4 +1,4 @@
-// This is the header file "FactorizedJetCorrectionUncertainty.h". This is the interface for the 
+// This is the header file "FactorizedJetCorrectionUncertainty.h". This is the interface for the
 // class FactorizedJetCorrectionUncertainty.
 // Author: Alexx Perloff, Emily MacDonald
 // Email:  alexx.stephen.perloff@cern.ch, emacdonald16@tamu.edu
@@ -83,10 +83,10 @@ class FactorizedJetCorrectionUncertainty
 
     void setNPV		(int   fNPV);
     void setJetEta      (float fEta);
-    void setJetPt       (float fPt); 
+    void setJetPt       (float fPt);
     void setJetE        (float fE);
     void setJetPhi      (float fE);
-    void setJetEMF      (float fEMF); 
+    void setJetEMF      (float fEMF);
     void setJetA        (float fA);
     void setRho         (float fRho);
     void setJPTrawP4    (const TLorentzVector& fJPTrawP4);
@@ -97,11 +97,12 @@ class FactorizedJetCorrectionUncertainty
     void setAddLepToJet (bool fAddLepToJet);
 
     float getUncertainty();
-    std::vector<float> getSubUncertainties();
-    
-       
+    //was std::vector<float>
+    float getSubUncertainties();
+
+
   private:
-  //---- Member Functions ----  
+  //---- Member Functions ----
     FactorizedJetCorrectionUncertainty(const FactorizedJetCorrectionUncertainty&);
     FactorizedJetCorrectionUncertainty& operator= (const FactorizedJetCorrectionUncertainty&);
     //---- Member Data ---------

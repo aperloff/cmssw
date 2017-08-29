@@ -124,7 +124,7 @@ class JetCorrectionUncertaintyCollection {
 
   typedef int                            key_type;
   typedef std::string                    label_type;
-  typedef JetCorrectionUncertainty       value_type; //is this right? JetCorrectorParameters?
+  typedef JetCorrectionUncertainty       value_type;
   typedef std::pair<key_type,value_type> pair_type;
   typedef std::vector<pair_type>         collection_type;
 
@@ -139,12 +139,12 @@ class JetCorrectionUncertaintyCollection {
 
   // Access the JetCorrectorParameter via the key k.
   // key_type is hashed to deal with the three collections
-  JetCorrectionUncertainty const & operator[]( key_type k ) const; //is this right?
+  JetCorrectionUncertainty const & operator[]( key_type k ) const;
 
   // Access the JetCorrectorParameter via a string.
   // Will find the hashed value for the label, and call via that
   // operator.
-  JetCorrectionUncertainty const & operator[]( std::string const & label ) const { //is this right?
+  JetCorrectionUncertainty const & operator[]( std::string const & label ) const {
     return operator[]( findKey(label) );
   }
 
