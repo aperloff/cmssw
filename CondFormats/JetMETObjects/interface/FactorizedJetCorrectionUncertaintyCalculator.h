@@ -138,8 +138,7 @@ class FactorizedJetCorrectionUncertaintyCalculator
     FactorizedJetCorrectionUncertaintyCalculator(const JetCorrectionUncertaintyCollection& fParameters);
     ~FactorizedJetCorrectionUncertaintyCalculator() {}
     float getUncertainty(VariableValues&) const;
-    //was std::vector<float>
-    float getSubUncertainties(VariableValues&) const;
+    std::vector<float> getSubUncertainties(VariableValues&) const;
 
 
   private:

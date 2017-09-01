@@ -97,8 +97,7 @@ class FactorizedJetCorrectionUncertainty
     void setAddLepToJet (bool fAddLepToJet);
 
     float getUncertainty();
-    //was std::vector<float>
-    float getSubUncertainties();
+    std::vector<float> getSubUncertainties();
 
 
   private:

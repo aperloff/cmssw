@@ -407,6 +407,7 @@ JetCorrectionUncertainty const & JetCorrectionUncertaintyCollection::operator[](
   for ( ; i != iend; ++i ) {
     if ( k == i->first ) return i->second;
   }
+
   throw cms::Exception("InvalidInput") << " cannot find key " << static_cast<int>(k)
                                        << " in the JEC payload, this usually means you have to change the global tag" << std::endl;
 }

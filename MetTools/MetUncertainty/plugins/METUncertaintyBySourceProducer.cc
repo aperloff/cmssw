@@ -100,11 +100,17 @@ METUncertaintyBySourceProducer::produce(edm::Event& iEvent, const edm::EventSetu
     math::XYZTLorentzVector vjet_down = ajet_down.p4();
     math::XYZTLorentzVector vjet_up = ajet_up.p4();
 
-    //Create a jcuc of all the sources per jet, set eta and pt, retrieve total uncertainty
-    //edm::ESHandle<JetCorrectionUncertaintyCollection> jcucHandle; //works? compiles. Do I need handle?
-    JetCorrectionUncertaintyCollection jcuc(JECFile_,sources_); //works? compiles
-    auto fcuc = std::make_unique<FactorizedJetCorrectionUncertainty>(jcuc);
+    //Create a jcuc of all the sources per jet
+    //loop over sources, creating a different jcu for each source, and pushing back to the jcuc (key, jcu)
+    JetCorrectionUncertaintyCollection jcuc;
+    for (int i=0; i<numSources_; i++){
+      JetCorrectorParameters jcp(JECFile_, sources_[i]);
+      JetCorrectionUncertainty jcu(jcp);
+      jcuc.push_back(jcuc.findKey(sources_[i]),jcu);
+    }
 
+    //Create FactorizedJetCorrectionUncertainty, set eta and pt, retrieve total uncertainty
+    auto fcuc = std::make_unique<FactorizedJetCorrectionUncertainty>(jcuc);
     fcuc->setJetEta(itJet->eta());
     fcuc->setJetPt(itJet->pt());
     double tot_unc = fcuc->getUncertainty();

@@ -46,8 +46,7 @@ float FactorizedJetCorrectionUncertainty::getUncertainty()
 //------------------------------------------------------------------------
 //--- Returns the vector of subcorrections, up to a given level ----------
 //------------------------------------------------------------------------
-//was std::vector<float>
-float FactorizedJetCorrectionUncertainty::getSubUncertainties()
+std::vector<float> FactorizedJetCorrectionUncertainty::getSubUncertainties()
 {
   return mCalc.getSubUncertainties(mValues);
 }

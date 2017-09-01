@@ -162,10 +162,11 @@ class JetCorrectionUncertaintyCollection {
 
   const collection_type& getUncertainties() const {return uncertainties_;}
 
- protected:
-
   // Find the key corresponding to each label
   key_type findKey( std::string const & label ) const;
+
+ protected:
+
 
   collection_type uncertainties_;
 
