@@ -49,10 +49,12 @@ private:
   edm::EDGetTokenT<edm::View<pat::MET> > slimmedmetTok_ ;
   std::vector <std::string> sources_;
   std::string JECFile_;
-  int numSources_; //do I still need?
+  int numSources_;
 
   edm::Handle< edm::View<pat::Jet> > jets;
   edm::Handle< edm::View<pat::MET> > slimmedMETs;
+  typedef std::vector<pat::MET> MetCollection;
+
 };
 // constants, enums and typedefs
 
@@ -66,8 +68,8 @@ sources_(iConfig.getParameter<std::vector <std::string> >("sources")),
 JECFile_(iConfig.getParameter<std::string>("JECFile")),
 numSources_(iConfig.getParameter<int>("numSources"))
 {
-  produces<pat::MET>( "METJECUp" ); //correct? Will this add to ntuple?
-  produces<pat::MET>( "METJECDown" ); //correct?
+  produces<MetCollection>( "METUp" ).setBranchAlias( "METUp" );
+  produces<MetCollection>( "METDown" ).setBranchAlias( "METDown" );
 }
 
 // member functions
@@ -81,11 +83,16 @@ METUncertaintyBySourceProducer::produce(edm::Event& iEvent, const edm::EventSetu
   iEvent.getByToken(JetTok_, jets);
   iEvent.getByToken(slimmedmetTok_, slimmedMETs);
 
-  auto METJECUp = std::make_unique<pat::MET>();
-  auto METJECDown = std::make_unique<pat::MET>();
-  auto newJets_up  = std::make_unique<std::vector<pat::Jet>>();
+  pat::MET(METJECUp);
+  pat::MET(METJECDown);
+  std::unique_ptr<MetCollection> METJECUpvec( new MetCollection );
+  std::unique_ptr<MetCollection> METJECDownvec( new MetCollection );
+  METJECUpvec->reserve(1);
+  METJECDownvec->reserve(1);
+
+  auto newJets_up  = std::make_unique<std::vector<pat::Jet> >();
   newJets_up->reserve(jets->size());
-  auto newJets_down  = std::make_unique<std::vector<pat::Jet>>();
+  auto newJets_down  = std::make_unique<std::vector<pat::Jet> >();
   newJets_down->reserve(jets->size());
 
   math::XYZTLorentzVector diff_up(0,0,0,0); //reset sum(jet_corr-jet)
@@ -134,15 +141,22 @@ METUncertaintyBySourceProducer::produce(edm::Event& iEvent, const edm::EventSetu
   } //end jets loop
 
   //using slimmedMET
-  //slimmedmet=slimmedMETs->at(0).pt();
+  double slimmedmet=slimmedMETs->at(0).pt();
   math::XYZTLorentzVector metP4 = slimmedMETs->at(0).p4(); //slimmedMETs is handle
 
   //calculate "corrected" MET for both up/down variation
-  METJECUp->setP4(metP4 + diff_up); //compiles
-  METJECDown->setP4(metP4 + diff_down); //compiles
+  METJECUp.setP4(metP4 + diff_up);
+  METJECDown.setP4(metP4 + diff_down);
 
-  iEvent.put(std::move(METJECUp));
-  iEvent.put(std::move(METJECDown));
+  METJECUpvec->push_back(METJECUp);
+  METJECDownvec->push_back(METJECDown);
+  std::cout<<std::endl<<"Checking MET. . ."<<std::endl<<"MET: "<<slimmedmet<<", corrUp: "<<METJECUpvec->at(0).pt()<<", corrDown: "<<METJECDownvec->at(0).pt()<<std::endl;
+
+  std::string upName = "METUp";//same as instance name
+  std::string downName = "METDown";
+
+  iEvent.put(std::move(METJECUpvec), upName);
+  iEvent.put(std::move(METJECDownvec), downName);
 } //end produce
 
 DEFINE_FWK_MODULE(METUncertaintyBySourceProducer);

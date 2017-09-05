@@ -359,6 +359,7 @@ const std::vector<std::string> labels_ = {
 }
 //------------------------------------------------------------------------
 JetCorrectionUncertaintyCollection::JetCorrectionUncertaintyCollection( std::string inputTxtFile, std::vector<label_type> chosen_sections ) {
+  std::cout<<std::endl;
   uncertainties_.clear();
   for(auto cs : chosen_sections) {
     push_back(findKey(cs),JetCorrectionUncertainty(inputTxtFile,cs));
@@ -396,7 +397,7 @@ void JetCorrectionUncertaintyCollection::getSections(std::string inputFile,
 //------------------------------------------------------------------------
 // Add a JetCorrectorParameter object, possibly with flavor.
 void JetCorrectionUncertaintyCollection::push_back( key_type i, value_type const & j) {
-  std::cout << "i    = " << i << std::endl;
+  std::cout << "i=" << i << "  ";
   uncertainties_.emplace_back(i,j);
 }
 //------------------------------------------------------------------------
