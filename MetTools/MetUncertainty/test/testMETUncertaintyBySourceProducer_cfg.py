@@ -21,7 +21,9 @@ process.source = cms.Source("PoolSource",
 process.METUncertaintyByJECSource = cms.EDProducer('METUncertaintyBySourceProducer',
     numSources = cms.int32(2), #Make sure to change to reflect number of sources
     sources = cms.vstring(['AbsoluteStat','PileUpPtEC2']), #List any sources
+    #JECFile is the text file of JEC uncertainties, separated by source
     JECFile = cms.string('/uscms_data/d3/emacdona/WorkingArea/CMSSW_9_3_0_pre1/src/CondFormats/Summer16_03Feb2017_V1_MC_UncertaintySources_AK4PFchs.txt'),
+    collName = cms.string('randomSources'), #change for name of collection (total, subtotal, relative, etc.)
     slimmedMETTag = cms.InputTag("slimmedMETs"),
     JetTag  = cms.InputTag('slimmedJets'),
 )

@@ -50,6 +50,7 @@ private:
   std::vector <std::string> sources_;
   std::string JECFile_;
   int numSources_;
+  std::string collectionName;
 
   edm::Handle< edm::View<pat::Jet> > jets;
   edm::Handle< edm::View<pat::MET> > slimmedMETs;
@@ -66,10 +67,11 @@ JetTok_(consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("JetT
 slimmedmetTok_(consumes<edm::View<pat::MET> >(iConfig.getParameter<edm::InputTag>("slimmedMETTag"))),
 sources_(iConfig.getParameter<std::vector <std::string> >("sources")),
 JECFile_(iConfig.getParameter<std::string>("JECFile")),
-numSources_(iConfig.getParameter<int>("numSources"))
+numSources_(iConfig.getParameter<int>("numSources")),
+collectionName(iConfig.getParameter<std::string>("collName"))
 {
-  produces<MetCollection>( "METUp" ).setBranchAlias( "METUp" );
-  produces<MetCollection>( "METDown" ).setBranchAlias( "METDown" );
+  produces<MetCollection>( collectionName+"METUp" ).setBranchAlias( collectionName+"METUp" );
+  produces<MetCollection>( collectionName+"METDown" ).setBranchAlias( collectionName+"METDown" );
 }
 
 // member functions
@@ -152,11 +154,10 @@ METUncertaintyBySourceProducer::produce(edm::Event& iEvent, const edm::EventSetu
   METJECDownvec->push_back(METJECDown);
   std::cout<<std::endl<<"Checking MET. . ."<<std::endl<<"MET: "<<slimmedmet<<", corrUp: "<<METJECUpvec->at(0).pt()<<", corrDown: "<<METJECDownvec->at(0).pt()<<std::endl;
 
-  std::string upName = "METUp";//same as instance name
-  std::string downName = "METDown";
 
-  iEvent.put(std::move(METJECUpvec), upName);
-  iEvent.put(std::move(METJECDownvec), downName);
+
+  iEvent.put(std::move(METJECUpvec),  collectionName+"METUp" );
+  iEvent.put(std::move(METJECDownvec), collectionName+"METDown" );
 } //end produce
 
 DEFINE_FWK_MODULE(METUncertaintyBySourceProducer);
