@@ -44,6 +44,7 @@
 #include "fastjet/CMSIterativeConePlugin.hh"
 #include "fastjet/ATLASConePlugin.hh"
 #include "fastjet/CDFMidPointPlugin.hh"
+#include "fastjet/contrib/VariableRPlugin.hh"
 
 #include <iostream>
 #include <memory>
@@ -135,6 +136,9 @@ VirtualJetProducer::VirtualJetProducer(const edm::ParameterSet& iConfig) {
 	inputEtMin_    		= iConfig.getParameter<double>  ("inputEtMin");
 	inputEMin_     		= iConfig.getParameter<double>  ("inputEMin");
 	jetPtMin_      		= iConfig.getParameter<double>  ("jetPtMin");
+    variableRRho_       = iConfig.getParameter<double>  ("variableRRho");
+    variableRMin_       = iConfig.getParameter<double>  ("variableRMin");
+    variableRMax_       = iConfig.getParameter<double>  ("variableRMax");
 	doPVCorrection_		= iConfig.getParameter<bool>    ("doPVCorrection");
 	doAreaFastjet_ 		= iConfig.getParameter<bool>    ("doAreaFastjet");
 	doRhoFastjet_  		= iConfig.getParameter<bool>    ("doRhoFastjet");
@@ -177,38 +181,42 @@ VirtualJetProducer::VirtualJetProducer(const edm::ParameterSet& iConfig) {
 	//
 	if (jetAlgorithm_=="Kt") 
 		fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(fastjet::kt_algorithm,rParam_));
-
-	else if (jetAlgorithm_=="CambridgeAachen")
-		fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(fastjet::cambridge_algorithm,rParam_) );
-
+    else if (jetAlgorithm_=="KtVariableR") {
+       fastjet::contrib::VariableRPlugin vrPluginKT(variableRRho_, variableRMin_, variableRMax_, fastjet::contrib::VariableRPlugin::KTLIKE);
+       fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&vrPluginKT) );
+	}
+    else if (jetAlgorithm_=="CambridgeAachen")
+       fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(fastjet::cambridge_algorithm,rParam_) );
+    else if (jetAlgorithm_=="CambridgeAachenVariableR") {
+       fastjet::contrib::VariableRPlugin vrPluginCA(variableRRho_, variableRMin_, variableRMax_, fastjet::contrib::VariableRPlugin::CALIKE);
+       fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&vrPluginCA) );
+    }
 	else if (jetAlgorithm_=="AntiKt")
 		fjJetDefinition_= JetDefPtr( new fastjet::JetDefinition(fastjet::antikt_algorithm,rParam_) );
-
-	else if (jetAlgorithm_=="GeneralizedKt") 
-		fjJetDefinition_= JetDefPtr( new fastjet::JetDefinition(fastjet::genkt_algorithm,rParam_,-2) );
-
+    else if (jetAlgorithm_=="AntiKtVariableR") {
+       fastjet::contrib::VariableRPlugin vrPluginAKT(variableRRho_, variableRMin_, variableRMax_, fastjet::contrib::VariableRPlugin::AKTLIKE);
+       fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&vrPluginAKT) );
+	}
+    else if (jetAlgorithm_=="GeneralizedKt") 
+       fjJetDefinition_= JetDefPtr( new fastjet::JetDefinition(fastjet::genkt_algorithm,rParam_,-2) );
 	else if (jetAlgorithm_=="SISCone") {
-
 		fjPlugin_ = PluginPtr( new fastjet::SISConePlugin(rParam_,0.75,0,0.0,false,fastjet::SISConePlugin::SM_pttilde) );
 		fjJetDefinition_= JetDefPtr( new fastjet::JetDefinition(&*fjPlugin_) );
-
-	} else if (jetAlgorithm_=="IterativeCone") {
-
+	}
+    else if (jetAlgorithm_=="IterativeCone") {
 		fjPlugin_ = PluginPtr(new fastjet::CMSIterativeConePlugin(rParam_,1.0));
 		fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&*fjPlugin_));
-
-	} else if (jetAlgorithm_=="CDFMidPoint") {
-
+	}
+    else if (jetAlgorithm_=="CDFMidPoint") {
 		fjPlugin_ = PluginPtr(new fastjet::CDFMidPointPlugin(rParam_,0.75));
 		fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&*fjPlugin_));
-
-	} else if (jetAlgorithm_=="ATLASCone") {
-
+	}
+    else if (jetAlgorithm_=="ATLASCone") {
 		fjPlugin_ = PluginPtr(new fastjet::ATLASConePlugin(rParam_));
 		fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&*fjPlugin_));
-
-	} else {
-		throw cms::Exception("Invalid jetAlgorithm") <<"Jet algorithm for VirtualJetProducer is invalid, Abort!\n";
+	}
+    else {
+       throw cms::Exception("Invalid jetAlgorithm") <<"Jet algorithm for VirtualJetProducer is invalid, Abort!\n";
 	}
 
 	jetTypeE=JetType::byName(jetType_);
