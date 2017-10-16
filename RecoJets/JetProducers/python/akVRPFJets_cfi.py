@@ -10,9 +10,11 @@ akVRPFJets = cms.EDProducer(
     "FastjetJetProducer",
     PFJetParameters,
     AnomalousCellParameters,
-    jetAlgorithm = cms.string("AntiKt"),
-    jetPtMin = cms.double(50.0)
-    rParam = cms.double(345) #rho_default=2*m_{X} (GeV)
+    jetAlgorithm = cms.string("AntiKtVariableR"),
+    jetPtMin = cms.double(50.0),
+    variableRRho = cms.double(345.0), #rho_default=2*m_{X} (GeV)
+    variableRMin = cms.double(0.0),
+    variableRMax = cms.double(2.0),
     )
 
 ##############################################################################

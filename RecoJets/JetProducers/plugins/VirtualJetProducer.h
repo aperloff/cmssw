@@ -171,6 +171,9 @@ protected:
   double                inputEtMin_;                // minimum et of input constituents
   double                inputEMin_;                 // minimum e of input constituents
   double                jetPtMin_;                  // minimum jet pt
+  double                variableRRho_;              // the rho parameter to use
+  double                variableRMin_;              // minimum R of the jet
+  double                variableRMax_;              // maximum R of the jet
   bool                  doPVCorrection_;            // correct to primary vertex? 
 
   // for restricting inputs due to processing time
