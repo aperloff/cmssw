@@ -11,11 +11,11 @@ akVRPFJets = cms.EDProducer(
     PFJetParameters,
     AnomalousCellParameters,
     jetAlgorithm = cms.string("AntiKtVariableR"),
-    jetPtMin = cms.double(50.0),
     variableRRho = cms.double(345.0), #rho_default=2*m_{X} (GeV)
     variableRMin = cms.double(0.0),
     variableRMax = cms.double(2.0),
     )
+akVRPFJets.jetPtMin = cms.double(50.0)
 
 ##############################################################################
 # AKVR jets with various pileup subtraction schemes

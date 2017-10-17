@@ -1022,6 +1022,9 @@ void VirtualJetProducer::fillDescriptionsFromVirtualJetProducer(edm::ParameterSe
 	desc.add<double>("inputEtMin",		0.0 );
 	desc.add<double>("inputEMin",		0.0 );
 	desc.add<double>("jetPtMin",		5. );
+    desc.add<double>("variableRRho",  345.0);
+    desc.add<double>("variableRMin",    0.0);
+    desc.add<double>("variableRMax",    2.0);
 	desc.add<bool> 	("doPVCorrection",	false );
 	desc.add<bool> 	("doAreaFastjet",	false );
 	desc.add<bool>  ("doRhoFastjet",	false );
