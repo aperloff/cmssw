@@ -182,20 +182,20 @@ VirtualJetProducer::VirtualJetProducer(const edm::ParameterSet& iConfig) {
 	if (jetAlgorithm_=="Kt") 
 		fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(fastjet::kt_algorithm,rParam_));
     else if (jetAlgorithm_=="KtVariableR") {
-       fastjet::contrib::VariableRPlugin vrPluginKT(variableRRho_, variableRMin_, variableRMax_, fastjet::contrib::VariableRPlugin::KTLIKE);
-       fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&vrPluginKT) );
+       fjPlugin_ = PluginPtr(new fastjet::contrib::VariableRPlugin(variableRRho_, variableRMin_, variableRMax_, fastjet::contrib::VariableRPlugin::KTLIKE) );
+       fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&*fjPlugin_) );
 	}
     else if (jetAlgorithm_=="CambridgeAachen")
        fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(fastjet::cambridge_algorithm,rParam_) );
     else if (jetAlgorithm_=="CambridgeAachenVariableR") {
-       fastjet::contrib::VariableRPlugin vrPluginCA(variableRRho_, variableRMin_, variableRMax_, fastjet::contrib::VariableRPlugin::CALIKE);
-       fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&vrPluginCA) );
+       fjPlugin_ = PluginPtr(new fastjet::contrib::VariableRPlugin(variableRRho_, variableRMin_, variableRMax_, fastjet::contrib::VariableRPlugin::CALIKE) );
+       fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&*fjPlugin_) );
     }
 	else if (jetAlgorithm_=="AntiKt")
 		fjJetDefinition_= JetDefPtr( new fastjet::JetDefinition(fastjet::antikt_algorithm,rParam_) );
     else if (jetAlgorithm_=="AntiKtVariableR") {
-       fastjet::contrib::VariableRPlugin vrPluginAKT(variableRRho_, variableRMin_, variableRMax_, fastjet::contrib::VariableRPlugin::AKTLIKE);
-       fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&vrPluginAKT) );
+       fjPlugin_ = PluginPtr(new fastjet::contrib::VariableRPlugin(variableRRho_, variableRMin_, variableRMax_, fastjet::contrib::VariableRPlugin::AKTLIKE) );
+       fjJetDefinition_= JetDefPtr(new fastjet::JetDefinition(&*fjPlugin_) );
 	}
     else if (jetAlgorithm_=="GeneralizedKt") 
        fjJetDefinition_= JetDefPtr( new fastjet::JetDefinition(fastjet::genkt_algorithm,rParam_,-2) );
