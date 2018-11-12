@@ -10,6 +10,7 @@
   TH1F* h_eta = new TH1F("eta","Leading Jets eta",100,-5.0,5.0);
   TH1F* h_phi = new TH1F("phi","Leading Jets phi",72,-3.141527,3.141527);
   TH1F* h_m2j = new TH1F("m2j","Dijet Mass",100,0.0,1000.0);
+  TH1F* h_area = new TH1F("area","Leading Jets Area",31,0.0,3.1);
 
   //Get event tree and jet collection branch
   TTree *tree = (TTree*)file.Get("Events");
@@ -34,7 +35,8 @@
       //Get and printout jet pt, eta, phi for all jets
       double pt = Jet->pt();    std::cout << ": pt=" << pt; 
       double eta = Jet->eta();  std::cout << ", eta=" << eta;
-      double phi = Jet->phi();  std::cout << ", phi=" << phi << std::endl;
+      double phi = Jet->phi();  std::cout << ", phi=" << phi;
+      double area = Jet->jetArea(); std::cout << ", area=" << area << std::endl;
 
       if(jetIndex<2)
       {
@@ -43,6 +45,7 @@
         h_pt->Fill(pt); 
 	h_eta->Fill(eta); 
 	h_phi->Fill(phi);       
+    h_area->Fill(area);
         
        //Get Lorentz Vector components of two highest pt jets
        px[jetIndex] = Jet->px();
