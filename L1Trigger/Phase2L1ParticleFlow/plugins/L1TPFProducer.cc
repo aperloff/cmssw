@@ -26,7 +26,7 @@
 #include "L1Trigger/Phase2L1ParticleFlow/interface/LinearizedPuppiAlgo.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/DiscretePFInputsIO.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/COEFile.h"
-
+#include "L1Trigger/Phase2L1ParticleFlow/interface/APxPatternFile.h"
 #include "DataFormats/L1TCorrelator/interface/TkMuon.h"    
 #include "DataFormats/L1TCorrelator/interface/TkMuonFwd.h" 
 
@@ -64,10 +64,11 @@ class L1TPFProducer : public edm::stream::EDProducer<> {
 
         edm::EDGetTokenT<math::XYZPointF> TokGenOrigin_;
 
-        // Region dump/coe
+        // Region dump/coe/apx
         FILE *fRegionDump;
         l1tpf_impl::COEFile *fRegionCOE;
-        unsigned int neventscoemax, neventsproduced;
+        l1tpf_impl::APxPatternFile *fRegionAPx;
+        unsigned int nEventsCOEMax, nEventsAPxPerFile, nEventsAPxMax, nEventsProduced;
 
         // region of interest debugging
         float debugEta_, debugPhi_, debugR_;
@@ -97,6 +98,7 @@ L1TPFProducer::L1TPFProducer(const edm::ParameterSet& iConfig):
     l1pualgo_(nullptr),
     fRegionDump(nullptr),
     fRegionCOE(nullptr),
+    fRegionAPx(nullptr),
     debugEta_(iConfig.getUntrackedParameter<double>("debugEta",0)),
     debugPhi_(iConfig.getUntrackedParameter<double>("debugPhi",0)),
     debugR_(iConfig.getUntrackedParameter<double>("debugR",-1))
@@ -160,11 +162,17 @@ L1TPFProducer::L1TPFProducer(const edm::ParameterSet& iConfig):
         fRegionDump = fopen(dumpFileName.c_str(), "wb");
         TokGenOrigin_ = consumes<math::XYZPointF>(iConfig.getParameter<edm::InputTag>("genOrigin"));
     }
-    std::string coeFileName = iConfig.getUntrackedParameter<std::string>("coeFileName", "");
+    std::string coeFileName = iConfig.getUntrackedParameter<std::string>("COEFileName", "");
     if (!coeFileName.empty()) {
-        fRegionCOE = new l1tpf_impl::COEFile(iConfig);
-        neventscoemax = iConfig.getUntrackedParameter<unsigned int>("neventscoemax");
-        neventsproduced = 0;
+        fRegionCOE = new l1tpf_impl::COEFile(iConfig,std::ios_base::out|std::ios_base::trunc);
+        nEventsCOEMax = iConfig.getUntrackedParameter<unsigned int>("nEventsCOEMax");
+        nEventsProduced = 0;
+    }
+    std::string apxFileName = iConfig.getUntrackedParameter<std::string>("APxFileName", "");
+    if (!apxFileName.empty()) {
+        fRegionAPx = new l1tpf_impl::APxPatternFile(iConfig,std::ios_base::out|std::ios_base::trunc);
+        nEventsAPxPerFile = iConfig.getUntrackedParameter<unsigned int>("nEventsAPxPerFile");
+        nEventsAPxMax = iConfig.getUntrackedParameter<unsigned int>("nEventsAPxMax");
     }
 
     for (int tot = 0; tot <= 1; ++tot) {
@@ -189,7 +197,8 @@ L1TPFProducer::~L1TPFProducer() {
     // do anything here that needs to be done at desctruction time
     // (e.g. close files, deallocate resources etc.)
     if (fRegionDump) fclose(fRegionDump);
-    if (fRegionCOE)  fRegionCOE->close();
+    if (fRegionCOE && fRegionCOE->is_open())  fRegionCOE->close();
+    if (fRegionAPx && fRegionAPx->is_open())  fRegionAPx->close();
 }
 
 // ------------ method called to produce the data  ------------
@@ -271,13 +280,19 @@ L1TPFProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         l1tpf_impl::writeManyToFile(l1regions_.regions(), fRegionDump);
     }
 
-    // Then save the regions to the COE file
+    // Then save the regions to the COE and/or APx pattern file(s)
     // Do it here because there is some sorting going on in a later function
-    if (fRegionCOE && fRegionCOE->is_open() && neventsproduced<neventscoemax) {
-        std::vector<l1tpf_impl::Region> regions = l1regions_.regions();
-        fRegionCOE->writeTracksToFile(regions,neventsproduced==0);
+    std::vector<l1tpf_impl::Region> regions = l1regions_.regions();
+    if (fRegionCOE) {
+        if (!fRegionCOE->is_full()) fRegionCOE->storeTracks(regions);
+        if (fRegionCOE->is_full() && nEventsProduced==nEventsCOEMax-1) fRegionCOE->writeObjectsToFile();
     }
-    neventsproduced++;
+    // Then save the regions to the APx pattern file
+    if (fRegionAPx) {
+        if (!fRegionAPx->is_full()) fRegionAPx->storeTracks(regions);
+        if (fRegionAPx->is_full() && nEventsProduced==nEventsAPxMax-1) fRegionAPx->writeObjectsToFiles();
+    }
+    nEventsProduced++;
 
     // Then do the vertexing, and save it out
     float z0;

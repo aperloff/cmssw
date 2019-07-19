@@ -2,87 +2,82 @@
 
 using namespace l1tpf_impl;
 
-COEFile::COEFile(const edm::ParameterSet& iConfig)  :
-	file(nullptr),
-	coeFileName(iConfig.getUntrackedParameter<std::string>("coeFileName", "")),
-	bset_string_(""),
-	ntracksmax(iConfig.getUntrackedParameter<unsigned int>("ntracksmax")),
-	phiSlices(iConfig.getParameter<std::vector<edm::ParameterSet>>("regions")[0].getParameter<uint32_t>("phiSlices")),
-	debug_(iConfig.getUntrackedParameter<int>("debug",0))
-{
-	file = fopen(coeFileName.c_str(), "w");
-	writeHeaderToFile();
+void COEFile::readFile() {
+	// Check that you're not at the end of the open file
+	if (eof()) {
+		message.str("");
+		message << "Unable to read event " << nEventsProcessed << ".\nYou've already reached the end of the file.\n";
+		throw cms::Exception("FileReadError", message.str());
+	}
+	if (header.empty()) {
+		throw cms::Exception("FileReadError", "The header hasn't been read yet. As the file pointer will be out of position, we cannot parse the file.\n");
+	}
+
+	resetBitsetTable();
 	bset_.resize(tracksize);
-}
+	bset_string_.resize(tracksize);
+	std::string endline;
+	endline.resize(2);
+	unsigned int lineCounter(headerSize);
 
-void COEFile::writeHeaderToFile() {
-	char depth_width[256];
-	sprintf(depth_width, "; of depth=%i, and width=%i. In this case, values are specified\n",ntracksmax,tracksize*phiSlices);
-	std::vector<std::string> vheader = {"; Sample memory initialization file for Dual Port Block Memory,\n",
-										"; v3.0 or later.\n",
-										"; Board: VCU118\n",
-										"; tmux: 1\n",
-										";\n",
-										"; This .COE file specifies the contents for a block memory\n",
-										std::string(depth_width),
-										"; in binary format.\n",
-										"memory_initialization_radix=2;\n",
-										"memory_initialization_vector=\n"};
-	for (uint32_t i=0; i<vheader.size(); ++i) fprintf(file, vheader[i].c_str());
-}
+	while (!eof()) {
+		for (unsigned int isector=0; isector < bset_table_.size(); isector++) {
+			file.read(&bset_string_[0],tracksize);
+			bset_.reset();
+			bset_ = boost::dynamic_bitset<> (bset_string_);
 
-void COEFile::writeTracksToFile(const std::vector<Region>& regions, bool print) {
-	PropagatedTrack current_track;
-	bool has_track = false;
-	for (unsigned int irow = 0; irow < ntracksmax; irow++) {
-		for (unsigned int icol = 0; icol < regions.size(); icol++) {
-			if (regions[icol].track.size()<=irow) has_track = false;
-			else has_track = true;
-
-			if (has_track) {
-				// select the track that will be converted to a bit string
-				current_track = regions[icol].track[irow];
-
-				// convert the values in a PropogatedTrack to a 96-bit track word
-				for (unsigned int iblock=0; iblock<track_word_block_sizes.size(); iblock++) {
-					for (unsigned int ibit=0; ibit<track_word_block_sizes[iblock]; ibit++) {
-						int offset = std::accumulate(track_word_block_sizes.begin(), track_word_block_sizes.begin()+iblock, 0);
-						switch(iblock) {
-							case 0 : bset_.set(ibit+offset,getBit<uint16_t>(current_track.hwPt,ibit)); break;
-							case 1 : bset_.set(ibit+offset,current_track.hwCharge); break;
-							case 2 : bset_.set(ibit+offset,getBit<uint16_t>(current_track.hwVtxPhi,ibit)); break;
-							case 3 : bset_.set(ibit+offset,getBit<uint16_t>(current_track.hwVtxEta,ibit)); break;
-							case 4 : bset_.set(ibit+offset,getBit<uint16_t>(current_track.hwZ0,ibit)); break;
-							case 5 : bset_.set(ibit+offset,0); break;
-							case 6 : bset_.set(ibit+offset,getBit<uint16_t>(current_track.hwChi2,ibit)); break;
-							case 7 : bset_.set(ibit+offset,0); break;
-							case 8 : bset_.set(ibit+offset,getBit<uint16_t>(current_track.hwStubs,ibit)); break;
-							case 9 : bset_.set(ibit+offset,0); break;
-						}
-					}
-				}
-
-				// print the track word to the COE file
-				boost::to_string(bset_,bset_string_);
-				fprintf(file, "%s", bset_string_.c_str());
-
-				// print some debugging information
-				if (debug_ && print && irow==0 && icol==0) {
-					printf("region: eta=[%f,%f] phi=%f+/-%f\n",regions[icol].etaMin,regions[icol].etaMax,regions[icol].phiCenter,regions[icol].phiHalfWidth);
-					printf("l1t::PFTrack (pT,eta,phi) [float] = (%f,%f,%f)\n",current_track.src->p4().Pt(),current_track.src->p4().Eta(),current_track.src->p4().Phi());
-					printf("l1t::PFTrack (pT,eta,phi) [int] = (%i,%i,%i)\n",current_track.src->hwPt(),current_track.src->hwEta(),current_track.src->hwPhi());
-					printf("l1tpf_impl::PropagatedTrack (1/pT,eta,phi) [int,10] = (%i,%i,%i)\n",current_track.hwPt,current_track.hwVtxEta,current_track.hwVtxPhi);
-					printf("l1tpf_impl::PropagatedTrack (1/pT,eta,phi) [int,2] = (%s,%s,%s)\n",std::bitset<16>(current_track.hwPt).to_string().c_str(),std::bitset<32>(current_track.hwVtxEta).to_string().c_str(),std::bitset<32>(current_track.hwVtxPhi).to_string().c_str());
-					printf("bitset = %s\n",bset_string_.c_str());
-				}
-			}
-			else {
-				bset_.reset();
-				boost::to_string(bset_,bset_string_);
-				fprintf(file, "%s", bset_string_.c_str());
-			}
+			// Save the bitset for later
+			bset_table_[isector].push_back(bset_);
 		}
-		fprintf(file, (irow==ntracksmax-1) ? ";\n" : ",\n");
+		// Remove the trailing characters
+		file.read(&endline[0],2);
+
+		if (endline!=",\n" && endline!=";\n") {
+			message.str("");
+			message << "Something went wrong reading line " << lineCounter << " of the COE file.\n"
+					<< "\tThe line should have ended with \',<newline>\' or \';<newline>\', but instead ended with \'" << endline << "\'\n";
+			throw cms::Exception("FileReadError", message.str());
+		}
+
+		lineCounter++;
+		if (lineCounter%nTracksMax == 0) nEventsProcessed++;
+	}
+
+	bset_table_collection_.push_back(bset_table_);
+	events_per_file_.push_back(nEventsProcessed);
+	resetBitsetTable();
+	if (debug_) edm::LogInfo("COEFile") << "@SUB=COEFile::readFile" << "Bitset table " << bset_table_collection_.size()
+										<< " (index=" << bset_table_collection_.size()-1 << ") has shape ("
+										<< bset_table_collection_.back()[0].size() << "x" << bset_table_collection_.back().size() << ")";
+}
+
+void COEFile::writeHeader() {
+	file << "; Sample memory initialization file for Dual Port Block Memory,\n"
+		 << "; v3.0 or later.\n"
+		 << "; Board: VCU118\n"
+		 << "; tmux: 1\n"
+		 << ";\n"
+		 << "; This .COE file specifies the contents for a block memory\n"
+		 << "; of depth=" << nTracksMax << ", and width=" << tracksize*nLinks << ". In this case, values are specified\n"
+		 << "; in binary format.\n"
+		 << "memory_initialization_radix=2;\n"
+		 << "memory_initialization_vector=\n";
+}
+
+void COEFile::writeObjectsToFile() {
+	// Right now the all events are written to a single COE file
+	writeHeader();
+	bset_table_ = bset_table_collection_[0];
+
+	unsigned int nrows = bset_table_[0].size();
+	for (unsigned int irow = 0; irow < nrows; irow++) {
+		for (unsigned int icol = 0; icol < bset_table_.size(); icol++) {
+			boost::to_string(bset_table_[icol][irow],bset_string_);
+			file << bset_string_.c_str();
+		}
+		if (eof() && irow+1==nrows) file << ";\n";
+		else                        file << ",\n";
+
+		if ( (irow!=0) && (irow%nTracksMax==0)) nEventsProcessed++;
 	}
 }
-
