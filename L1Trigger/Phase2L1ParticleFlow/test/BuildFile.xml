@@ -1,0 +1,45 @@
+<bin name = "testAPxLinePair" file="testAPxLinePair.cpp">
+	<flags TEST_RUNNER_CMD="cd $(CMSSW_BASE)/src/L1Trigger/Phase2L1ParticleFlow/test; testAPxLinePair"/>
+	<use name="boost"/>
+	<use name="boost_program_options"/>
+	<use name="FWCore/FWLite"/>
+	<use name="FWCore/MessageLogger"/>
+	<use name="FWCore/ParameterSet"/>
+	<use name="FWCore/ParameterSetReader"/>
+	<use name="FWCore/PluginManager"/>
+	<use name="FWCore/ServiceRegistry"/>
+	<use name="FWCore/Utilities"/>
+	<use name="L1Trigger/Phase2L1ParticleFlow"/>
+</bin>
+<bin name = "testPatternFile" file="testPatternFile.cpp">
+	<flags TEST_RUNNER_CMD="cd $(CMSSW_BASE)/src/L1Trigger/Phase2L1ParticleFlow/test; testPatternFile 1 trackerRegion_alltracks_sectors_2x9_TTbar_PU200_74Events.coe trackerRegion_alltracks_sectors_2x9_TTbar_PU200_7Events_0.txt 96 95 0 0 9 -3 0 3"/>
+	<use name="boost"/>
+	<use name="boost_program_options"/>
+	<use name="root"/>
+	<use name="FWCore/FWLite"/>
+	<use name="FWCore/MessageLogger"/>
+	<use name="FWCore/ParameterSet"/>
+	<use name="FWCore/ParameterSetReader"/>
+	<use name="FWCore/PluginManager"/>
+	<use name="FWCore/ServiceRegistry"/>
+	<use name="FWCore/Utilities"/>
+	<use name="DataFormats/FWLite"/>
+	<use name="DataFormats/Phase2L1ParticleFlow"/>
+	<use name="L1Trigger/Phase2L1ParticleFlow"/>
+</bin>
+<bin name = "testOutputFiles" file="testOutputFiles.cpp">
+	<flags TEST_RUNNER_CMD="cd $(CMSSW_BASE)/src/L1Trigger/Phase2L1ParticleFlow/test; testOutputFiles Phase2L1ParticleFlowOutput.root trackerRegion_alltracks_sectors_2x9_TTbar_PU200.dump trackerRegion_alltracks_sectors_2x9_TTbar_PU200.coe 0 0 9 -3 0 3"/>
+	<use name="boost"/>
+	<use name="boost_program_options"/>
+	<use name="root"/>
+	<use name="FWCore/FWLite"/>
+	<use name="FWCore/MessageLogger"/>
+	<use name="FWCore/ParameterSet"/>
+	<use name="FWCore/ParameterSetReader"/>
+	<use name="FWCore/PluginManager"/>
+	<use name="FWCore/ServiceRegistry"/>	
+	<use name="FWCore/Utilities"/>
+	<use name="DataFormats/FWLite"/>
+	<use name="DataFormats/Phase2L1ParticleFlow"/>
+	<use name="L1Trigger/Phase2L1ParticleFlow"/>
+</bin>
