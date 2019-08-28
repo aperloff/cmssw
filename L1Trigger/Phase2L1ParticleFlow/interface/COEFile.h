@@ -9,6 +9,8 @@
 // external package include files
 #include <boost/dynamic_bitset.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <ap_int.h>
+#include <ap_fixed.h>
 
 // user include files
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
