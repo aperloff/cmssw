@@ -250,7 +250,7 @@ L1TPFProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     // Do it here because there is some sorting going on in a later function
     if (fRegionCOE && fRegionCOE->is_open() && neventsproduced<neventscoemax) {
         std::vector<l1tpf_impl::Region> regions = l1regions_.regions();
-        fRegionCOE->writeTracksToFile(regions,neventsproduced==0);
+        fRegionCOE->writeTracksToFile(regions,neventsproduced==neventscoemax-1,neventsproduced==0);
     }
     neventsproduced++;
 

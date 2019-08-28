@@ -13,6 +13,13 @@ COEFile::COEFile(const edm::ParameterSet& iConfig)  :
 	file = fopen(coeFileName.c_str(), "w");
 	writeHeaderToFile();
 	bset_.resize(tracksize);
+
+	std::string trackRepresentationMode = "integer";
+	if (iConfig.existsAs<std::string>("trackRepresentationMode")) trackRepresentationMode = iConfig.getParameter<std::string>("trackRepresentationMode");
+	if (trackRepresentationMode == "integer")          trackRepresentationMode_ = integer;
+	else if (trackRepresentationMode == "fixedPoint")  trackRepresentationMode_ = fixedPoint;
+	else throw cms::Exception("Configuration", "Unsupported value for trackRepresentationMode: " + trackRepresentationMode+" (allowed are 'integer', 'fixedPoint')");
+	std::cout << "COE file track representation: " << trackRepresentationMode << std::endl;
 }
 
 void COEFile::writeHeaderToFile() {
@@ -31,7 +38,7 @@ void COEFile::writeHeaderToFile() {
 	for (uint32_t i=0; i<vheader.size(); ++i) fprintf(file, vheader[i].c_str());
 }
 
-void COEFile::writeTracksToFile(const std::vector<Region>& regions, bool print) {
+void COEFile::writeTracksToFile(const std::vector<Region>& regions, bool last_event, bool print) {
 	PropagatedTrack current_track;
 	bool has_track = false;
 	for (unsigned int irow = 0; irow < ntracksmax; irow++) {
@@ -82,7 +89,7 @@ void COEFile::writeTracksToFile(const std::vector<Region>& regions, bool print) 
 				fprintf(file, "%s", bset_string_.c_str());
 			}
 		}
-		fprintf(file, (irow==ntracksmax-1) ? ";\n" : ",\n");
+		fprintf(file, (irow==ntracksmax-1)&&(last_event) ? ";\n" : ",\n");
 	}
 }
 
