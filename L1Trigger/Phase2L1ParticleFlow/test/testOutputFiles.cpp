@@ -23,6 +23,7 @@
 // CMSSW includes
 #include "FWCore/FWLite/interface/FWLiteEnabler.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/FWLite/interface/Handle.h"
 #include "DataFormats/FWLite/interface/Run.h"
 #include "DataFormats/FWLite/interface/LuminosityBlock.h"
@@ -288,6 +289,10 @@ std::map<std::pair<int,int>,TLorentzVector*> get_tracks_from_coe_file(std::ifstr
 	return tracks_coe;
 }
 
+//std::map<std::pair<int,int>,TLorentzVector*> get_tracks_from_apx_file(std::ifstream &cfile_, bool print = false, bool debug = false) {
+//Event by event
+//}
+
 std::ifstream& GotoLine(std::ifstream& file, unsigned int num){
 	file.seekg(std::ios::beg);
 	for(unsigned int i=0; i < num - 1; ++i){
@@ -420,6 +425,10 @@ int main(int argc, char *argv[]) {
 	std::cout << "Number of tracks per sector: " << NTRACKS_PER_SECTOR << std::endl
 			  << "Number of bits per track: " << NBITS_PER_TRACK << std::endl
 			  << "==============" << std::endl << std::endl;
+
+	// Create a parameter set to pass to the PatternFile classes
+	edm::ParameterSet iConfig;
+	iConfig.addParameter("COEFileName",filename_coe);
 
 	// open the files for testing
 	TFile* rfile_ = TFile::Open(filename_root.c_str(),"READ");
