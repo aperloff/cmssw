@@ -2,8 +2,8 @@
 
 using namespace l1tpf_impl;
 
-PatternFile::PatternFile(const edm::ParameterSet& iConfig, const PatternFileType patternFileType) :
-	file(nullptr),
+PatternFile::PatternFile(const edm::ParameterSet& iConfig, std::ios_base::openmode fileOpenMode, const PatternFileType patternFileType) :
+	openMode(fileOpenMode),
 	fileName(iConfig.getUntrackedParameter<std::string>(getFileTypeString(patternFileType)+"FileName", "")),
 	bset_string_(""),
 	nTracksMax(iConfig.getUntrackedParameter<unsigned int>("nTracksMax")),
@@ -26,7 +26,7 @@ PatternFile::PatternFile(const edm::ParameterSet& iConfig, const PatternFileType
 	if (trackRepresentationMode == "integer")          trackRepresentationMode_ = integer;
 	else if (trackRepresentationMode == "fixedPoint")  trackRepresentationMode_ = fixedPoint;
 	else throw cms::Exception("Configuration", "Unsupported value for trackRepresentationMode: " + trackRepresentationMode+" (allowed are 'integer', 'fixedPoint')");
-	edm::LogVerbatim("L1TPFProducer|PatternFile") << "@SUB=PatternFile" << getFileTypeString(patternFileType) << " file track representation: " << trackRepresentationMode;
+	edm::LogVerbatim("PatternFile") << "@SUB=PatternFile" << getFileTypeString(patternFileType) << " file track representation: " << trackRepresentationMode;
 
 	// Bitset operations
 	bset_.resize(tracksize);
@@ -38,7 +38,10 @@ PatternFile::PatternFile(const edm::ParameterSet& iConfig, const PatternFileType
 		// Prepare for the case where there will be multiple files and a suffix must be appended to each filename
 		fileName = fileNameBase + "_" + std::to_string(0) + fileExtension;
 	}
-	open();
+	bool success = open();
+	if (!success) {
+		throw cms::Exception("FileOpenError", "Unable to open the file "+fileName+"\n");
+	}
 }
 
 // Convert the values in a PropogatedTrack to a 96-bit track word
@@ -92,19 +95,19 @@ void PatternFile::printDebugInfo(const Region& region, const PropagatedTrack& tr
 			<< "l1tpf_impl::PropagatedTrack (1/pT,eta,phi) [int,10] = (" << track.hwPt << "," << track.hwVtxEta << "," << track.hwVtxPhi << ")" << std::endl
 			<< "l1tpf_impl::PropagatedTrack (1/pT,eta,phi) [int,2] = (" << std::bitset<16>(track.hwPt).to_string() << "," << std::bitset<32>(track.hwVtxEta).to_string() << "," << std::bitset<32>(track.hwVtxPhi).to_string() << ")" << std::endl
 			<< "bitset = " << bset_string_ << std::endl;
-	edm::LogInfo("L1TPFProducer|PatternFile") << "@SUB=PatternFile::printDebugInfo" << message.str();
+	edm::LogInfo("PatternFile") << "@SUB=PatternFile::printDebugInfo" << message.str();
 }
 
 std::string PatternFile::readHeader() {
 	if (header != "") {
-		edm::LogError("L1TPFProducer|PatternFile") << "@SUB=PatternFile::readHeader" << "The header is already filled and will not be reset!";
+		edm::LogError("PatternFile") << "@SUB=PatternFile::readHeader" << "The header is already filled and will not be reset!";
 	}
 	else {
-		if (ftell(file) != 0) {
+		if (file.tellg() != 0) {
 			throw cms::Exception("LogicError", "The position indicator of the file is not at the beginning.\n The header cannot be parsed correctly.\n");
 		}
 		std::string line;
-		for (unsigned int iline = 0; iline < this->getHeaderSize() && std::getline(file,line); ++iline) {
+		for (unsigned int iline = 0; iline < this->getHeaderLines() && std::getline(file,line); ++iline) {
 			header.append(line);
 		}
 	}

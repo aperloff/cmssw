@@ -7,19 +7,16 @@ bool COEFile::readFile() {
 }
 
 void COEFile::writeHeader() {
-	message.str("");
-	message << "; Sample memory initialization file for Dual Port Block Memory,\n"
-			<< "; v3.0 or later.\n"
-			<< "; Board: VCU118\n"
-			<< "; tmux: 1\n"
-			<< ";\n"
-			<< "; This .COE file specifies the contents for a block memory\n"
-			<< "; of depth=" << nTracksMax << ", and width=" << tracksize*phiSlices*etaRegions << ". In this case, values are specified\n"
-			<< "; in binary format.\n"
-			<< "memory_initialization_radix=2;\n"
-			<< "memory_initialization_vector=\n";
-	header = message.str();
-	fprintf(file, header.c_str());
+	file << "; Sample memory initialization file for Dual Port Block Memory,\n"
+		 << "; v3.0 or later.\n"
+		 << "; Board: VCU118\n"
+		 << "; tmux: 1\n"
+		 << ";\n"
+		 << "; This .COE file specifies the contents for a block memory\n"
+		 << "; of depth=" << nTracksMax << ", and width=" << tracksize*phiSlices*etaRegions << ". In this case, values are specified\n"
+		 << "; in binary format.\n"
+		 << "memory_initialization_radix=2;\n"
+		 << "memory_initialization_vector=\n";
 }
 
 void COEFile::writeTracksToFile(const std::vector<Region>& regions, bool print) {
@@ -39,7 +36,7 @@ void COEFile::writeTracksToFile(const std::vector<Region>& regions, bool print) 
 
 				// print the track word to the COE file
 				boost::to_string(bset_,bset_string_);
-				fprintf(file, "%s", bset_string_.c_str());
+				file << bset_string_.c_str();
 
 				// print some debugging information
 				if (debug_ && print && irow==0 && icol==0) {
@@ -49,10 +46,11 @@ void COEFile::writeTracksToFile(const std::vector<Region>& regions, bool print) 
 			else {
 				bset_.reset();
 				boost::to_string(bset_,bset_string_);
-				fprintf(file, "%s", bset_string_.c_str());
+				file << bset_string_.c_str();
 			}
 		}
-		fprintf(file, (irow==nTracksMax-1)&&(nEventsProcessed+1==nEventsMax) ? ";\n" : ",\n");
+		if ( (irow==nTracksMax-1) && (nEventsProcessed+1==nEventsMax) )	file << ";\n";
+		else															file << ",\n";
 	}
 	nEventsProcessed++;
 	full = ((nEventsMax!=-1) && (nEventsMax==nEventsProcessed));

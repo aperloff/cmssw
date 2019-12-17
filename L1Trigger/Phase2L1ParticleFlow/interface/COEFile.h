@@ -13,12 +13,12 @@ namespace l1tpf_impl {
 			static constexpr unsigned int header_size = 10;
 
 		public:
-			COEFile(const edm::ParameterSet& iConfig) : PatternFile(iConfig,l1tpf_impl::PatternFile::PatternFileType::COE) {}
+			COEFile(const edm::ParameterSet& iConfig, std::ios_base::openmode openMode) : PatternFile(iConfig,openMode,l1tpf_impl::PatternFile::PatternFileType::COE) {}
 			~COEFile() {}
 
-			unsigned int	getHeaderSize() { return header_size; }
+			//bool			eof() {}
+			unsigned int	getHeaderLines() { return header_size; }
 			bool			readFile();
-			std::string		readHeader() { return l1tpf_impl::PatternFile::readHeader(header_size); }
 			void			writeHeader();
 			void			writeTracksToFile(const std::vector<Region>& regions, bool print = false);
 	};

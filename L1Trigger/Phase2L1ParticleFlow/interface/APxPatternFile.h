@@ -15,17 +15,17 @@ namespace l1tpf_impl {
 			static constexpr unsigned int header_size = 3;
 
 		public:
-			APxPatternFile(const edm::ParameterSet& iConfig) : PatternFile(iConfig,l1tpf_impl::PatternFile::PatternFileType::APx), ifile(0) {
+			APxPatternFile(const edm::ParameterSet& iConfig, std::ios_base::openmode openMode) : PatternFile(iConfig,openMode,l1tpf_impl::PatternFile::PatternFileType::APx), ifile(0) {
 				bset_table_.resize(phiSlices*etaRegions);
 			}
 			~APxPatternFile() {}
 
 			bool			eof() { return (nEventsProcessed+1 == nEventsMax) || ((nEventsProcessed+1)%nEventsPerFile==0); }
-			unsigned int	getHeaderSize() { return header_size; }
+			unsigned int	getHeaderLines() { return header_size; }
 			bool			nextFile();
 			void			printDebugInfo(int nrow = -1);
+			bool			readFile() { return true; }
 			void			resetBitsetTable() { bset_table_.clear(); bset_table_.resize(phiSlices*etaRegions); }
-			std::string		readHeader() { return l1tpf_impl::PatternFile::readHeader(header_size); }
 			void			storeTracks(const std::vector<Region>& regions);
 			void			writeHeader();
 			void			writeTracksToFile();

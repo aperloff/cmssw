@@ -157,14 +157,14 @@ L1TPFProducer::L1TPFProducer(const edm::ParameterSet& iConfig):
     }
     std::string coeFileName = iConfig.getUntrackedParameter<std::string>("COEFileName", "");
     if (!coeFileName.empty()) {
-        fRegionCOE = new l1tpf_impl::COEFile(iConfig);
+        fRegionCOE = new l1tpf_impl::COEFile(iConfig,std::ios_base::out|std::ios_base::trunc);
         fRegionCOE->writeHeader();
         nEventsCOEMax = iConfig.getUntrackedParameter<unsigned int>("nEventsCOEMax");
         nEventsProduced = 0;
     }
     std::string apxFileName = iConfig.getUntrackedParameter<std::string>("APxFileName", "");
     if (!apxFileName.empty()) {
-        fRegionAPx = new l1tpf_impl::APxPatternFile(iConfig);
+        fRegionAPx = new l1tpf_impl::APxPatternFile(iConfig,std::ios_base::out|std::ios_base::trunc);
         nEventsAPxPerFile = iConfig.getUntrackedParameter<unsigned int>("nEventsAPxPerFile");
         nEventsAPxMax = iConfig.getUntrackedParameter<unsigned int>("nEventsAPxMax");
     }

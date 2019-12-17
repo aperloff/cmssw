@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <fstream>
 #include <numeric>
 #include <sstream>
 #include <string>
@@ -43,28 +44,30 @@ namespace l1tpf_impl {
 
 		public:
 			// Constructor
-			PatternFile(const edm::ParameterSet&, const PatternFileType);
+			PatternFile(const edm::ParameterSet&, std::ios_base::openmode fileOpenMode, const PatternFileType);
 			PatternFile(string fileName_, unsigned int nTracksMax_, unsigned int phiSlices,
 						unsigned int etaRegions, int nEventsMax, int nEventsPerFile, bool debug = false);
 
 			// Destructor
-			virtual ~PatternFile() { delete file; }
+			virtual ~PatternFile() {}
 
 			// Methods
 			void							assignTrackToBitset(const PropagatedTrack& track);
-			void							close() { fclose(file); }
+			void							close() { file.close(); file.clear(); }
+			bool							eof() = 0;
 			template<typename T>
 			bool							getBit(T value, unsigned bit) { return (value >> bit) & 1; }
 			DynamicBitset					getBits(const boost::dynamic_bitset<>& track, unsigned int start_bit = 0, unsigned int end_bit = 63);
+			virtual unsigned int			getHeaderLines() = 0;
 			DynamicBitset					getTrackLSB(const boost::dynamic_bitset<>& track) { return getBits(track,0,63); }
 			DynamicBitset					getTrackMSB(const boost::dynamic_bitset<>& track) { return getBits(track,32,95); }
 			DynamicBitset					getTrackLSBPlusMSB(const boost::dynamic_bitset<>& track1, const boost::dynamic_bitset<>& track2);
 			std::string						getFileTypeString(PatternFileType type) { return typeStrings[type]; }
 			bool							is_full() { return full; }
-			bool							is_open() { return (file != nullptr); }
-			void							open() { file = fopen(fileName.c_str(), "w"); }
+			bool							is_open() { return file.is_open(); }
+			bool							open() { file.open(fileName, openMode); return file.good(); }
 			void							printDebugInfo(const Region& region, const PropagatedTrack& track);
-			std::string						readHeader(unsigned int nlines);
+			std::string						readHeader();
 			virtual void					writeHeader() = 0;
 
 			virtual bool					readFile() = 0;
@@ -77,7 +80,8 @@ namespace l1tpf_impl {
 
 		protected:
 			// Data Members
-			FILE *file;
+			std::fstream file;
+			std::ios_base::openmode openMode;
 			std::string fileName, bset_string_, fileNameBase, fileExtension, header;
 			unsigned int nTracksMax, phiSlices, etaRegions, nFiles;
 			int nEventsMax, nEventsPerFile, nEventsProcessed, debug_;
