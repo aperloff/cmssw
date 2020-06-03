@@ -39,7 +39,8 @@ process.source = cms.Source("PoolSource",
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100))
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
-process.MessageLogger.categories.extend(['L1TPFProducer','PatternFile','COEFile','APxPatternFile'])
+process.MessageLogger.categories.extend(['L1TPFProducer','PatternFile','COEFile','APxPatternFile','APxLinePair'])
+#process.add_(cms.Service("Tracer"))
 
 process.load('SimCalorimetry.HcalTrigPrimProducers.hcaltpdigi_cff') # needed to read HCal TPs
 process.load('RecoMET.Configuration.GenMETParticles_cff')

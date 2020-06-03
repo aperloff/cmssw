@@ -3,6 +3,7 @@
 
 // user include files
 #include "L1Trigger/Phase2L1ParticleFlow/interface/PatternFile.h"
+#include "L1Trigger/Phase2L1ParticleFlow/interface/APxLinePair.h"
 
 namespace l1tpf_impl {
 
@@ -10,29 +11,29 @@ namespace l1tpf_impl {
 
 		protected:
 			// Constants
-			static constexpr unsigned int nstate = 3;
-			static constexpr unsigned int tracks_per_state = 2;
-			static constexpr unsigned int header_size = 3;
+			static constexpr l1tpf_impl::PatternFile::PatternFileType classType = l1tpf_impl::PatternFile::PatternFileType::APx;
+			static constexpr unsigned int wordsize = 64;
+			static constexpr unsigned int bitsToNibbles = 4;
+			static constexpr unsigned int wordchars = wordsize/bitsToNibbles;
+			static constexpr unsigned int nState = 3;
+			static constexpr unsigned int tracksPerState = 2;
+			static constexpr unsigned int headerSize = 3;
 
 		public:
-			APxPatternFile(const edm::ParameterSet& iConfig, std::ios_base::openmode openMode) : PatternFile(iConfig,openMode,l1tpf_impl::PatternFile::PatternFileType::APx), ifile(0) {
-				bset_table_.resize(phiSlices*etaRegions);
-			}
+			APxPatternFile(const edm::ParameterSet& iConfig, std::ios_base::openmode openMode) :
+				PatternFile(iConfig,openMode,classType), state(0) {}
 			~APxPatternFile() {}
 
-			bool			eof() { return (nEventsProcessed+1 == nEventsMax) || ((nEventsProcessed+1)%nEventsPerFile==0); }
-			unsigned int	getHeaderLines() { return header_size; }
+			PatternFileType getClassType() { return classType; }
+			unsigned int	getHeaderLines() { return headerSize; }
 			bool			nextFile();
-			void			printDebugInfo(int nrow = -1);
-			bool			readFile() { return true; }
-			void			resetBitsetTable() { bset_table_.clear(); bset_table_.resize(phiSlices*etaRegions); }
-			void			storeTracks(const std::vector<Region>& regions);
+			void			readFile();
 			void			writeHeader();
-			void			writeTracksToFile();
-			void			writeTracksToFiles();
+			void			writeObjectsToFile();
+			void			writeObjectsToFiles();
 
 		private:
-			unsigned int ifile;
+			unsigned int state;
 	};
 } // namespace
 

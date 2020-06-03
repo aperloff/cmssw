@@ -158,7 +158,6 @@ L1TPFProducer::L1TPFProducer(const edm::ParameterSet& iConfig):
     std::string coeFileName = iConfig.getUntrackedParameter<std::string>("COEFileName", "");
     if (!coeFileName.empty()) {
         fRegionCOE = new l1tpf_impl::COEFile(iConfig,std::ios_base::out|std::ios_base::trunc);
-        fRegionCOE->writeHeader();
         nEventsCOEMax = iConfig.getUntrackedParameter<unsigned int>("nEventsCOEMax");
         nEventsProduced = 0;
     }
@@ -260,13 +259,14 @@ L1TPFProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     // Then save the regions to the COE and/or APx pattern file(s)
     // Do it here because there is some sorting going on in a later function
     std::vector<l1tpf_impl::Region> regions = l1regions_.regions();
-    if (fRegionCOE && fRegionCOE->is_open() && !fRegionCOE->is_full()) {
-        fRegionCOE->writeTracksToFile(regions,nEventsProduced==0);
+    if (fRegionCOE) {
+        if (!fRegionCOE->is_full()) fRegionCOE->storeTracks(regions);
+        if (fRegionCOE->is_full() && nEventsProduced==nEventsCOEMax-1) fRegionCOE->writeObjectsToFile();
     }
     // Then save the regions to the APx pattern file
     if (fRegionAPx) {
         if (!fRegionAPx->is_full()) fRegionAPx->storeTracks(regions);
-        if (fRegionAPx->is_full() && nEventsProduced==nEventsAPxMax-1) fRegionAPx->writeTracksToFiles();
+        if (fRegionAPx->is_full() && nEventsProduced==nEventsAPxMax-1) fRegionAPx->writeObjectsToFiles();
     }
     nEventsProduced++;
 

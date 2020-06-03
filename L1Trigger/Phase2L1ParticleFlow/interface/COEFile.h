@@ -10,17 +10,18 @@ namespace l1tpf_impl {
 
 		protected:
 			// Constants
-			static constexpr unsigned int header_size = 10;
+			static constexpr l1tpf_impl::PatternFile::PatternFileType classType = l1tpf_impl::PatternFile::PatternFileType::COE;
+			static constexpr unsigned int headerSize = 10;
 
 		public:
-			COEFile(const edm::ParameterSet& iConfig, std::ios_base::openmode openMode) : PatternFile(iConfig,openMode,l1tpf_impl::PatternFile::PatternFileType::COE) {}
+			COEFile(const edm::ParameterSet& iConfig, std::ios_base::openmode openMode) : PatternFile(iConfig,openMode,classType) {}
 			~COEFile() {}
 
-			//bool			eof() {}
-			unsigned int	getHeaderLines() { return header_size; }
-			bool			readFile();
+			PatternFileType getClassType() { return classType; }
+			unsigned int	getHeaderLines() { return headerSize; }
+			void			readFile();
 			void			writeHeader();
-			void			writeTracksToFile(const std::vector<Region>& regions, bool print = false);
+			void			writeObjectsToFile();
 	};
 } // namespace
 
