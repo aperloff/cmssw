@@ -65,19 +65,13 @@ void COEPatternFile::writeHeader() {
 }
 
 void COEPatternFile::writeObjectsToFile() {
-	// Right now the all events are written to a single COE file
-	writeHeader();
-	bset_table_ = bset_table_collection_[0];
-
 	unsigned int nrows = bset_table_[0].size();
 	for (unsigned int irow = 0; irow < nrows; irow++) {
 		for (unsigned int icol = 0; icol < bset_table_.size(); icol++) {
 			boost::to_string(bset_table_[icol][irow],bset_string_);
 			file << bset_string_.c_str();
 		}
-		if (eof() && irow+1==nrows) file << ";\n";
+		if (irow+1==nrows) file << ";\n";
 		else                        file << ",\n";
-
-		if ( (irow!=0) && (irow%nTracksMax==0)) nEventsProcessed++;
 	}
 }

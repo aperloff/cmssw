@@ -284,7 +284,7 @@ L1TPFProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     std::vector<l1tpf_impl::Region> regions = l1regions_.regions();
     if (fRegionCOE) {
         if (!fRegionCOE->is_full()) fRegionCOE->storeTracks(regions);
-        if (fRegionCOE->is_full() && nEventsProduced==nEventsCOEMax-1) fRegionCOE->writeObjectsToFile();
+        if (fRegionCOE->is_full() && nEventsProduced==nEventsCOEMax-1) fRegionCOE->writeObjectsToFiles();
     }
     // Then save the regions to the APx pattern file
     if (fRegionAPx) {

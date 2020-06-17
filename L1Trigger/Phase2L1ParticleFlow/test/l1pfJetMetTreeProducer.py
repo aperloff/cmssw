@@ -151,20 +151,20 @@ goRegional()
 process.l1pfProducerGTT.genOrigin = cms.InputTag('genParticles','xyz0')
 process.l1pfProducerGTT.debug = cms.untracked.int32(0)
 process.l1pfProducerGTT.trackRepresentationMode = cms.untracked.string("integer") #Options: {integer, fixedPoint}
-process.l1pfProducerGTT.nTracksMax = cms.untracked.uint32(95)
+process.l1pfProducerGTT.nTracksMax = cms.untracked.uint32(95) #107 in the future
 secondary_file_path = os.getcwd()+'/trackerRegion_alltracks_sectors_%ix%i_TTbar_PU200_%itrackmax/' % (len(process.l1pfProducerGTT.regions[0].etaBoundaries)-1,process.l1pfProducerGTT.regions[0].phiSlices.value(),process.l1pfProducerGTT.nTracksMax.value())
 if not os.path.exists(secondary_file_path): os.makedirs(secondary_file_path)
 
 # DumpFile options
-process.l1pfProducerGTT.dumpFileName = cms.untracked.string("%strackerRegion_alltracks_sectors_%ix%i_TTbar_PU200.dump" % (secondary_file_path,len(process.l1pfProducerGTT.regions[0].etaBoundaries)-1,process.l1pfProducerGTT.regions[0].phiSlices.value()))
+process.l1pfProducerGTT.dumpFileName = cms.untracked.string("%strackerRegion_alltracks_sectors_%ix%i_TTbar_PU200_%iEventsTotal.dump" % (secondary_file_path,len(process.l1pfProducerGTT.regions[0].etaBoundaries)-1,process.l1pfProducerGTT.regions[0].phiSlices.value(),process.maxEvents.input.value()))
 
 # COEPatternFile options
-process.l1pfProducerGTT.nEventsCOEPerFile = cms.untracked.uint32(64)
+process.l1pfProducerGTT.nEventsCOEPerFile = cms.untracked.uint32(64) #64 is the maximum we can store on the VCU118
 process.l1pfProducerGTT.nEventsCOEMax = cms.untracked.uint32(128)
-process.l1pfProducerGTT.COEFileName = cms.untracked.string("%strackerRegion_alltracks_sectors_%ix%i_TTbar_PU200_%iEventsPerfile.coe" % (secondary_file_path,len(process.l1pfProducerGTT.regions[0].etaBoundaries)-1,process.l1pfProducerGTT.regions[0].phiSlices.value(),process.l1pfProducerGTT.nEventsCOEPerFile.value()))
+process.l1pfProducerGTT.COEFileName = cms.untracked.string("%strackerRegion_alltracks_sectors_%ix%i_TTbar_PU200_%iEventsPerFile.coe" % (secondary_file_path,len(process.l1pfProducerGTT.regions[0].etaBoundaries)-1,process.l1pfProducerGTT.regions[0].phiSlices.value(),process.l1pfProducerGTT.nEventsCOEPerFile.value()))
 
 # APxPatternFile options
-process.l1pfProducerGTT.nRowsAPxMax = cms.untracked.uint32(1024)
+process.l1pfProducerGTT.nRowsAPxMax = cms.untracked.uint32(1024) #1024 is the maximum as set by the APx Firmware Shell
 process.l1pfProducerGTT.nEventsAPxPerFile = cms.untracked.uint32(int(math.floor((2./3.)*process.l1pfProducerGTT.nRowsAPxMax.value()/process.l1pfProducerGTT.nTracksMax.value()))) # 2/3 for the tracks per row in the file
 process.l1pfProducerGTT.nEventsAPxMax = cms.untracked.uint32(105)
 process.l1pfProducerGTT.APxFileName = cms.untracked.string("%strackerRegion_alltracks_sectors_%ix%i_TTbar_PU200_%iEventsPerFile.txt" % (secondary_file_path,len(process.l1pfProducerGTT.regions[0].etaBoundaries)-1,process.l1pfProducerGTT.regions[0].phiSlices.value(),process.l1pfProducerGTT.nEventsAPxPerFile.value()))
