@@ -481,3 +481,18 @@ void PatternFile::storeTracks(const std::vector<Region>& regions) {
 	nEventsProcessed++;
 	full = ((nEventsMax != -1) && (nEventsMax == nEventsProcessed));
 }
+
+void PatternFile::writeObjectsToFiles() {
+	unsigned int start_event(0), end_event(0);
+	do {
+		start_event = (ifile*nEventsPerFile);
+		end_event = std::min(int((ifile+1)*nEventsPerFile-1),nEventsProcessed);
+		edm::LogVerbatim("PatternFile") << "@SUB=PatternFile::writeObjectsToFiles" << "Writing " << getFileTypeString(this->getClassType()) << "PatternFile " << ifile+1 << " of "
+										<< nFiles << " (events " << start_event << "-" << end_event << " of " << nEventsProcessed << ") to " << fileName << " ... ";
+		assert(is_open());
+		bset_table_ = bset_table_collection_[ifile];
+		writeHeader();
+		writeObjectsToFile();
+		edm::LogVerbatim("PatternFile") << "@SUB=PatternFile::writeObjectsToFiles" << "\tDone writing file " << ifile+1;
+	} while (nextFile());
+}

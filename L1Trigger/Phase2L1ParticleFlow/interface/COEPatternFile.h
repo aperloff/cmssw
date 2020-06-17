@@ -22,7 +22,6 @@ namespace l1tpf_impl {
 			void			readFile();
 			void			writeHeader();
 			void			writeObjectsToFile();
-			void			writeObjectsToFiles();
 	};
 } // namespace
 

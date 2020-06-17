@@ -102,6 +102,7 @@ namespace l1tpf_impl {
 			void							storeTracks(const std::vector<Region>& regions);
 			virtual void					writeHeader() = 0;
 			virtual void					writeObjectsToFile() = 0;
+			void							writeObjectsToFiles();
 
 		protected:
 			// Data Members

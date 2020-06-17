@@ -121,18 +121,3 @@ void APxPatternFile::writeObjectsToFile() {
 		if (state == 2) itrack_pair+=2;
 	}
 }
-
-void APxPatternFile::writeObjectsToFiles() {
-	unsigned int start_event(0), end_event(0);
-	do {
-		start_event = (ifile*nEventsPerFile);
-		end_event = std::min(int((ifile+1)*nEventsPerFile-1),nEventsProcessed);
-		edm::LogVerbatim("APxPatternFile") << "@SUB=APxPatternFile::writeObjectsToFiles" << "Writing file " << ifile+1 << " of " << nFiles
-										   << " (events " << start_event << "-" << end_event << " of " << nEventsProcessed << ") to " << fileName << " ... ";
-		assert(is_open());
-		bset_table_ = bset_table_collection_[ifile];
-		writeHeader();
-		writeObjectsToFile();
-		edm::LogVerbatim("APxPatternFile") << "@SUB=APxPatternFile::writeObjectsToFiles" << "\tDone writing file " << ifile+1;
-	} while (nextFile());
-}
