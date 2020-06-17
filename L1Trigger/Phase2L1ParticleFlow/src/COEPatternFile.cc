@@ -1,8 +1,8 @@
-#include "L1Trigger/Phase2L1ParticleFlow/interface/COEFile.h"
+#include "L1Trigger/Phase2L1ParticleFlow/interface/COEPatternFile.h"
 
 using namespace l1tpf_impl;
 
-void COEFile::readFile() {
+void COEPatternFile::readFile() {
 	// Check that you're not at the end of the open file
 	if (eof()) {
 		message.str("");
@@ -46,12 +46,12 @@ void COEFile::readFile() {
 	bset_table_collection_.push_back(bset_table_);
 	events_per_file_.push_back(nEventsProcessed);
 	resetBitsetTable();
-	if (debug_) edm::LogInfo("COEFile") << "@SUB=COEFile::readFile" << "Bitset table " << bset_table_collection_.size()
-										<< " (index=" << bset_table_collection_.size()-1 << ") has shape ("
-										<< bset_table_collection_.back()[0].size() << "x" << bset_table_collection_.back().size() << ")";
+	if (debug_) edm::LogInfo("COEPatternFile") << "@SUB=COEPatternFile::readFile" << "Bitset table " << bset_table_collection_.size()
+											   << " (index=" << bset_table_collection_.size()-1 << ") has shape ("
+											   << bset_table_collection_.back()[0].size() << "x" << bset_table_collection_.back().size() << ")";
 }
 
-void COEFile::writeHeader() {
+void COEPatternFile::writeHeader() {
 	file << "; Sample memory initialization file for Dual Port Block Memory,\n"
 		 << "; v3.0 or later.\n"
 		 << "; Board: VCU118\n"
@@ -64,7 +64,7 @@ void COEFile::writeHeader() {
 		 << "memory_initialization_vector=\n";
 }
 
-void COEFile::writeObjectsToFile() {
+void COEPatternFile::writeObjectsToFile() {
 	// Right now the all events are written to a single COE file
 	writeHeader();
 	bset_table_ = bset_table_collection_[0];
