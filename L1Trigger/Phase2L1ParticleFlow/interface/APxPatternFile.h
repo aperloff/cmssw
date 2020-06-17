@@ -26,7 +26,6 @@ namespace l1tpf_impl {
 
 			PatternFileType getClassType() { return classType; }
 			unsigned int	getHeaderLines() { return headerSize; }
-			bool			nextFile();
 			void			readFile();
 			void			writeHeader();
 			void			writeObjectsToFile();

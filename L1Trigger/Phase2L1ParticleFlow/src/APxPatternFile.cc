@@ -2,23 +2,6 @@
 
 using namespace l1tpf_impl;
 
-bool APxPatternFile::nextFile() {
-	if (ifile == nFiles-1) return false;
-	else {
-		close();
-		ifile++;
-		fileName = fileNameBase + "_" + std::to_string(ifile) + fileExtension;
-		bool success = open();
-		if (!success) {
-			throw cms::Exception("FileOpenError", fileName+"\n\tfstream goodbit set to false!\n");
-		}
-		else if (!file.is_open()) {
-			throw cms::Exception("FileOpenError", "Unable to open the file "+fileName+"\n");
-		}
-	}
-	return true;
-}
-
 void APxPatternFile::readFile() {
 	// Check that you're not at the end of the open file
 	if (eof()) {

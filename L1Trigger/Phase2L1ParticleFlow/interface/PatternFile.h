@@ -89,6 +89,7 @@ namespace l1tpf_impl {
 			bool							loadEvent(unsigned int ifile_ = 0, unsigned int ievent_ = 0);
 			bool							loadNextEvent();
 			ROOT::Math::PtEtaPhiEVector		makeLorentzVector(float pt, float eta, float phi, float e) { return ROOT::Math::PtEtaPhiEVector(pt,eta,phi,e); }
+			bool							nextFile();
 			bool							open() { file.open(fileName, openMode); return file.good(); }
 			void							printCommonFormat(CommonFormat objects, const std::vector<Region>& regions = {});
 			void							printEventDebugInfo(unsigned int row = 0, bool verbatim = false);

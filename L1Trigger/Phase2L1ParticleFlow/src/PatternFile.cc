@@ -271,6 +271,23 @@ bool PatternFile::loadNextEvent() {
 	}
 }
 
+bool PatternFile::nextFile() {
+	if (ifile == nFiles-1) return false;
+	else {
+		close();
+		ifile++;
+		fileName = fileNameBase + "_" + std::to_string(ifile) + fileExtension;
+		bool success = open();
+		if (!success) {
+			throw cms::Exception("FileOpenError", fileName+"\n\tfstream goodbit set to false!\n");
+		}
+		else if (!file.is_open()) {
+			throw cms::Exception("FileOpenError", "Unable to open the file "+fileName+"\n");
+		}
+	}
+	return true;
+}
+
 void PatternFile::printCommonFormat(CommonFormat objects, const std::vector<Region>& regions) {
 	if ( (regions.size() != 0) && (regions.size() != nLinks) ) {
 		message.str("");
