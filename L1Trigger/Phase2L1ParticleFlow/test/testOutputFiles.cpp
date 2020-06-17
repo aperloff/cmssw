@@ -383,12 +383,12 @@ int main(int argc, char *argv[]) {
 	// store some programatic information
 	std::stringstream usage;
 	usage << "usage: " << argv[0] << " <filename>.root <filename>.dump <filename>.coe <filename>.txt <etaExtra> <phiExtra> <nRegionsPhi> <etaBoundaries>\n\n"
-		  << "Standalong compilation:\n"
+		  << "Standalone compilation:\n"
 		  << "\tg++ -I${CMSSW_BASE}/src/L1Trigger/Phase2L1ParticleFlow/interface/ -O0 -g3 -Wall -std=c++0x -c -fmessage-length=0 testOutputFiles.cpp\n"
 		  << "\tg++ -o testOutputFiles testOutputFiles.o\n"
 		  << "\t./testOutputFiles <arguments>\n\n"
 		  << "Run single test:\n"
-		  << "\t${CMSSW_BASE}/test/${SCRAM_ARCH}/testPatternFile <arguments>\n\n"
+		  << "\t${CMSSW_BASE}/test/${SCRAM_ARCH}/testOutputFiles <arguments>\n\n"
 		  << "Run all tests:\n"
 		  << "\tscram b runtests" << std::endl;
 

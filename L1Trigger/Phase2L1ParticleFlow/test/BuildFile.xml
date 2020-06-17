@@ -28,7 +28,7 @@
 	<use name="L1Trigger/Phase2L1ParticleFlow"/>
 </bin>
 <bin name = "testOutputFiles" file="testOutputFiles.cpp">
-	<flags TEST_RUNNER_CMD="cd $(CMSSW_BASE)/src/L1Trigger/Phase2L1ParticleFlow/test; testOutputFiles Phase2L1ParticleFlowOutput.root testInput.dump testInput.coe 0 0 9 -3 0 3"/>
+	<flags TEST_RUNNER_CMD="cd $(CMSSW_BASE)/src/L1Trigger/Phase2L1ParticleFlow/test; testOutputFiles Phase2L1ParticleFlowOutput.root testInput.dump testInput.coe testInput.txt 0 0 9 -3 0 3"/>
 	<use name="boost"/>
 	<use name="boost_program_options"/>
 	<use name="root"/>
