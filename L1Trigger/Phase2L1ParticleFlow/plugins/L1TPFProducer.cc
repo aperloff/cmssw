@@ -25,7 +25,7 @@
 #include "L1Trigger/Phase2L1ParticleFlow/interface/PuppiAlgo.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/LinearizedPuppiAlgo.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/DiscretePFInputsIO.h"
-#include "L1Trigger/Phase2L1ParticleFlow/interface/COEFile.h"
+#include "L1Trigger/Phase2L1ParticleFlow/interface/COEPatternFile.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/APxPatternFile.h"
 #include "DataFormats/L1TCorrelator/interface/TkMuon.h"    
 #include "DataFormats/L1TCorrelator/interface/TkMuonFwd.h" 
@@ -66,9 +66,9 @@ class L1TPFProducer : public edm::stream::EDProducer<> {
 
         // Region dump/coe/apx
         FILE *fRegionDump;
-        l1tpf_impl::COEFile *fRegionCOE;
+        l1tpf_impl::COEPatternFile *fRegionCOE;
         l1tpf_impl::APxPatternFile *fRegionAPx;
-        unsigned int nEventsCOEMax, nEventsAPxPerFile, nEventsAPxMax, nEventsProduced;
+        unsigned int nEventsCOEMax, nEventsAPxMax, nEventsProduced;
 
         // region of interest debugging
         float debugEta_, debugPhi_, debugR_;
@@ -157,6 +157,7 @@ L1TPFProducer::L1TPFProducer(const edm::ParameterSet& iConfig):
         produces<float>(label); 
     }
 
+    nEventsProduced = 0;
     std::string dumpFileName = iConfig.getUntrackedParameter<std::string>("dumpFileName", "");
     if (!dumpFileName.empty()) {
         fRegionDump = fopen(dumpFileName.c_str(), "wb");
@@ -164,14 +165,12 @@ L1TPFProducer::L1TPFProducer(const edm::ParameterSet& iConfig):
     }
     std::string coeFileName = iConfig.getUntrackedParameter<std::string>("COEFileName", "");
     if (!coeFileName.empty()) {
-        fRegionCOE = new l1tpf_impl::COEFile(iConfig,std::ios_base::out|std::ios_base::trunc);
+        fRegionCOE = new l1tpf_impl::COEPatternFile(iConfig,std::ios_base::out|std::ios_base::trunc);
         nEventsCOEMax = iConfig.getUntrackedParameter<unsigned int>("nEventsCOEMax");
-        nEventsProduced = 0;
     }
     std::string apxFileName = iConfig.getUntrackedParameter<std::string>("APxFileName", "");
     if (!apxFileName.empty()) {
         fRegionAPx = new l1tpf_impl::APxPatternFile(iConfig,std::ios_base::out|std::ios_base::trunc);
-        nEventsAPxPerFile = iConfig.getUntrackedParameter<unsigned int>("nEventsAPxPerFile");
         nEventsAPxMax = iConfig.getUntrackedParameter<unsigned int>("nEventsAPxMax");
     }
 

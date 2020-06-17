@@ -19,7 +19,7 @@
 			"        'Root_NoDictionary',\n"
 			"        'L1TPFProducer',\n"
 			"        'PatternFile',\n"
-			"        'COEFile',\n"
+			"        'COEPatternFile',\n"
 			"        'APxPatternFile'\n"
 			"        'APxLinePair'\n"
 			"        'testOutputFiles'\n"
@@ -98,4 +98,4 @@
 			"        placeholder = cms.untracked.bool(True)\n"
 			"    )\n"
 			")\n"
-			"process.MessageLogger.categories.extend(['L1TPFProducer','PatternFile','COEFile','APxPatternFile','APxLinePair','testOutputFiles','testPatternFile','testAPxLinePair'])\n";
+			"process.MessageLogger.categories.extend(['L1TPFProducer','PatternFile','COEPatternFile','APxPatternFile','APxLinePair','testOutputFiles','testPatternFile','testAPxLinePair'])\n";

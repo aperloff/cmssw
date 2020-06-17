@@ -19,7 +19,7 @@
 #include "FWCore/Utilities/interface/Presence.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/Region.h"
-#include "L1Trigger/Phase2L1ParticleFlow/interface/COEFile.h"
+#include "L1Trigger/Phase2L1ParticleFlow/interface/COEPatternFile.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/APxPatternFile.h"
 
 static std::vector<l1tpf_impl::Region> regions_;
@@ -97,8 +97,8 @@ int testPatternFiles(int argc, char *argv[]) {
 	iConfig.addParameter("regions",std::vector<edm::ParameterSet>{iConfigRegion});
 	iConfig.addUntrackedParameter("debug",debug);
 
-	edm::LogVerbatim("COEFile") << "@SUB=testPatternFile::testPatternFiles" << "Testing the COEFile code:";
-	l1tpf_impl::COEFile coefile(iConfig,std::ios_base::in);
+	edm::LogVerbatim("COEPatternFile") << "@SUB=testPatternFile::testPatternFiles" << "Testing the COEPatternFile code:";
+	l1tpf_impl::COEPatternFile coefile(iConfig,std::ios_base::in);
 	coefile.readHeader();
 	coefile.readFile();
 	coefile.loadEvent();

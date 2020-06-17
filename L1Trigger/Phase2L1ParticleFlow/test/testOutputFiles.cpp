@@ -40,7 +40,7 @@
 #include "DataFormats/L1TParticleFlow/interface/PFTrack.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/DiscretePFInputsIO.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/Region.h"
-#include "L1Trigger/Phase2L1ParticleFlow/interface/COEFile.h"
+#include "L1Trigger/Phase2L1ParticleFlow/interface/COEPatternFile.h"
 #include "L1Trigger/Phase2L1ParticleFlow/interface/APxPatternFile.h"
 
 #define NTEST 2
@@ -175,7 +175,7 @@ ObjectMap get_tracks_from_dump_file(FILE *dfile_ = nullptr, bool print = false) 
 	return tracks_dump;
 }
 
-ObjectMap get_tracks_from_coe_file(l1tpf_impl::COEFile &cfile_, bool print = false, bool debug = false) {
+ObjectMap get_tracks_from_coe_file(l1tpf_impl::COEPatternFile &cfile_, bool print = false, bool debug = false) {
 	cfile_.loadNextEvent();
 	cfile_.filterEmptyObjects();
 	ObjectMap ret = cfile_.convertBitsetTableToCommonFormat();
@@ -343,7 +343,7 @@ int testOutputFiles(int argc, char *argv[], std::string usage) {
 		edm::LogError("testOutputFiles") << "@SUB=testOutputFiles::testOutputFiles" << "Cannot open '" << filename_dump << "'";
 		return -10;
 	}
-	l1tpf_impl::COEFile cfile_(iConfig,std::ios_base::in);
+	l1tpf_impl::COEPatternFile cfile_(iConfig,std::ios_base::in);
 	cfile_.readHeader();
 	cfile_.readFile();
 	l1tpf_impl::APxPatternFile afile_(iConfig,std::ios_base::in);
