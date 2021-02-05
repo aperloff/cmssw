@@ -213,10 +213,9 @@ namespace l1tVertexFinder {
         break;
       }
     }
-    if ( (hepMCVertex_.vz() == 0.0) && (genVertex_.vz() == 0.0) ) {
+    if ((hepMCVertex_.vz() == 0.0) && (genVertex_.vz() == 0.0)) {
       throw cms::Exception("Neither the HepMC vertex nor the generator particle vertex were found.");
     }
-
 
   }  // end InputData::InputData
 

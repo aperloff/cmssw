@@ -4,7 +4,9 @@ using namespace std;
 
 namespace l1tVertexFinder {
 
-  void VertexFinder::computeAndSetVertexParameters(RecoVertex<>& vertex, const std::vector<float>& bin_centers, const std::vector<unsigned int>& counts) {
+  void VertexFinder::computeAndSetVertexParameters(RecoVertex<>& vertex,
+                                                   const std::vector<float>& bin_centers,
+                                                   const std::vector<unsigned int>& counts) {
     double pt = 0.;
     double z0 = 0.;
     double z0width = 0.;
@@ -16,7 +18,7 @@ namespace l1tVertexFinder {
     float z0square = 0.;
     float trackPt = 0.;
 
-    std::vector<double> bin_pt(bin_centers.size(),0.0);
+    std::vector<double> bin_pt(bin_centers.size(), 0.0);
     unsigned int ibin = 0;
     unsigned int itrack = 0;
 
@@ -37,8 +39,7 @@ namespace l1tVertexFinder {
       if (bin_centers.empty() && counts.empty()) {
         SumZ += track->z0() * std::pow(trackPt, settings_->vx_weightedmean());
         z0square += track->z0() * track->z0();
-      }
-      else {
+      } else {
         bin_pt[ibin] += std::pow(trackPt, settings_->vx_weightedmean());
         if (itrack == counts[ibin]) {
           SumZ += bin_centers[ibin] * bin_pt[ibin];
@@ -66,7 +67,7 @@ namespace l1tVertexFinder {
       if ((i + 1 < fitTracks_.size() and fitTracks_[i + 1].z0() - fitTracks_[i].z0() > settings_->vx_distance()) or
           i == fitTracks_.size() - 1) {
         if (Vertex.numTracks() >= settings_->vx_minTracks()) {
-          computeAndSetVertexParameters(Vertex,{},{});
+          computeAndSetVertexParameters(Vertex, {}, {});
           vertices_.push_back(Vertex);
         }
         Vertex.clear();
@@ -558,15 +559,16 @@ namespace l1tVertexFinder {
 
     // Compute the sums
     // sliding windows ... sum_i_i+(w-1) where i in (0,nbins-w) and w is the window size
-    std::vector<float> bin_centers(settings_->vx_windowSize(),0.0);
-    std::vector<unsigned int> counts(settings_->vx_windowSize(),0);
+    std::vector<float> bin_centers(settings_->vx_windowSize(), 0.0);
+    std::vector<unsigned int> counts(settings_->vx_windowSize(), 0);
     for (unsigned int i = 0; i < sums.size(); i++) {
       for (unsigned int j = 0; j < settings_->vx_windowSize(); j++) {
-        bin_centers[j] = settings_->vx_histogram_min()+((i+j)*settings_->vx_histogram_binwidth())+(0.5*settings_->vx_histogram_binwidth());
+        bin_centers[j] = settings_->vx_histogram_min() + ((i + j) * settings_->vx_histogram_binwidth()) +
+                         (0.5 * settings_->vx_histogram_binwidth());
         counts[j] = hist.at(i + j).numTracks();
         sums.at(i) += hist.at(i + j);
       }
-      computeAndSetVertexParameters(sums.at(i),bin_centers,counts);
+      computeAndSetVertexParameters(sums.at(i), bin_centers, counts);
     }
 
     // Find the maxima of the sums

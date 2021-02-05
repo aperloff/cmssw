@@ -62,7 +62,13 @@ namespace l1tVertexFinder {
     /// Set z0 position [cm]
     void setZ0(double z) { z0_ = z; }
     /// Set the vertex parameters
-    void setParameters(double pt, double z0, double width = -999., bool highPt = false, unsigned int nHighPt = -999, double highestPt = -999., bool pv = false);
+    void setParameters(double pt,
+                       double z0,
+                       double width = -999.,
+                       bool highPt = false,
+                       unsigned int nHighPt = -999,
+                       double highestPt = -999.,
+                       bool pv = false);
     /// Vertex z0 position [cm]
     double z0() const { return z0_; }
     /// Vertex z0 width [cm]
@@ -134,7 +140,8 @@ namespace l1tVertexFinder {
   }
 
   template <typename T>
-  void RecoVertex<T>::setParameters(double pt, double z0, double width, bool highPt, unsigned int nHighPt, double highestPt, bool pv) {
+  void RecoVertex<T>::setParameters(
+      double pt, double z0, double width, bool highPt, unsigned int nHighPt, double highestPt, bool pv) {
     pT_ = pt;
     z0_ = z0;
     z0width_ = width;

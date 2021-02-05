@@ -4,7 +4,8 @@ namespace l1t {
 
   Vertex::Vertex() : pt_(0.0), z0_(0.0) {}
 
-  Vertex::Vertex(float pt, float z0, const std::vector<edm::Ptr<Track_t>>& tracks) : pt_(pt), z0_(z0), tracks_(tracks) {}
+  Vertex::Vertex(float pt, float z0, const std::vector<edm::Ptr<Track_t>>& tracks)
+      : pt_(pt), z0_(z0), tracks_(tracks) {}
 
   Vertex::~Vertex() {}
 

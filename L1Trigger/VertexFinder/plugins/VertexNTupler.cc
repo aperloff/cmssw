@@ -573,8 +573,9 @@ namespace l1tVertexFinder {
       std::vector<std::shared_ptr<const RecoVertexWithTP>> recoVertices;
       recoVertices.reserve(handle->size());
       for (unsigned int i = 0; i < handle->size(); ++i) {
-        recoVertices.push_back(std::shared_ptr<const RecoVertexWithTP>(new RecoVertexWithTP(handle->at(i), edmL1TrackMaps.at(l1VerticesInputMap_.at(tokenMapEntry.first)))));
-      }  
+        recoVertices.push_back(std::shared_ptr<const RecoVertexWithTP>(
+            new RecoVertexWithTP(handle->at(i), edmL1TrackMaps.at(l1VerticesInputMap_.at(tokenMapEntry.first)))));
+      }
 
       branchData.clear();
       std::vector<L1TrackTruthMatched>& l1Tracks = l1TrackCollections.at(l1VerticesInputMap_.at(tokenMapEntry.first));

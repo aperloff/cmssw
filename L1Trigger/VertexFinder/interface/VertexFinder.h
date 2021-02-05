@@ -39,7 +39,7 @@ namespace l1tVertexFinder {
     };
 
     /// Accessors
-    
+
     /// Storage for tracks out of the L1 Track finder
     const FitTrackCollection& FitTracks() const { return fitTracks_; }
     /// Number of iterations
@@ -99,7 +99,9 @@ namespace l1tVertexFinder {
     /// Find distance between centres of two clusters
     float CentralDistance(RecoVertex<> cluster0, RecoVertex<> cluster1);
     /// Compute the vertex parameters
-    void computeAndSetVertexParameters(RecoVertex<>& vertex, const std::vector<float>& bin_centers, const std::vector<unsigned int>& counts);
+    void computeAndSetVertexParameters(RecoVertex<>& vertex,
+                                       const std::vector<float>& bin_centers,
+                                       const std::vector<unsigned int>& counts);
     /// DBSCAN algorithm
     void DBSCAN();
     /// TDR histogramming algorithmn
