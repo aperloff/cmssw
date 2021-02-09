@@ -26,37 +26,31 @@ namespace l1tVertexFinder {
                        const AnalysisSettings& settings,
                        const edm::EDGetTokenT<edm::HepMCProduct> hepMCToken,
                        const edm::EDGetTokenT<edm::View<reco::GenParticle>> genParticlesToken,
-                       const edm::EDGetTokenT<TrackingParticleCollection> tpToken,
+                       const edm::EDGetTokenT<edm::View<TrackingParticle>> tpToken,
+                       const edm::EDGetTokenT<edm::ValueMap<l1tVertexFinder::TP>> tpValueMapToken,
                        const edm::EDGetTokenT<DetSetVec> stubToken,
+                       const edm::EDGetTokenT<edm::ValueMap<l1tVertexFinder::Stub>> stubValueMapToken,
                        const edm::EDGetTokenT<TTStubAssMap> stubTruthToken,
                        const edm::EDGetTokenT<TTClusterAssMap> clusterTruthToken) {
-    vTPs_.reserve(2500);
-    vAllStubs_.reserve(35000);
-
     // Get TrackingParticle info
-    edm::Handle<TrackingParticleCollection> tpHandle;
+    edm::Handle<edm::View<TrackingParticle>> tpHandle;
+    edm::Handle<edm::ValueMap<TP>> tpValueMapHandle;
     iEvent.getByToken(tpToken, tpHandle);
+    iEvent.getByToken(tpValueMapToken, tpValueMapHandle);
 
     genPt_ = 0.;
     genPt_PU_ = 0.;
-
     for (unsigned int i = 0; i < tpHandle->size(); i++) {
       TrackingParticlePtr tpPtr(tpHandle, i);
-      // Store the TrackingParticle info, using class TP to provide easy access to the most useful info.
-      TP tp(&tpHandle->at(i), settings);
+      auto tpRef = tpHandle->refAt(i);
+      TP tp = (*tpValueMapHandle)[tpRef];
+      tpPtrToRefMap_[tpPtr] = tpRef;
 
       if (tp.physicsCollision()) {
         genPt_ += tp->pt();
       } else {
         genPt_PU_ += tp->pt();
-      }
-
-      // Only bother storing tp if it could be useful for tracking efficiency or fake rate measurements.
-      // Also create map relating edm::Ptr<TrackingParticle> to TP.
-      if (tp.use()) {
-        vTPs_.push_back(tp);
-        translateTP_[tpPtr] = &vTPs_.back();
-      }
+      }      
     }
 
     if (settings.debug() > 0) {
@@ -88,6 +82,7 @@ namespace l1tVertexFinder {
       }
     }
 
+    std::map<DetId, DetId> stubGeoDetIdMap;
     for (auto gd = trackerGeometry->dets().begin(); gd != trackerGeometry->dets().end(); gd++) {
       DetId detid = (*gd)->geographicalId();
       if (detid.subdetId() != StripSubdetector::TOB && detid.subdetId() != StripSubdetector::TID)
@@ -97,51 +92,29 @@ namespace l1tVertexFinder {
       DetId stackDetid = trackerTopology->stack(detid);  // Stub module detid
 
       if (lStubDetIds.count(stackDetid) > 0) {
-        assert(stubGeoDetIdMap_.count(stackDetid) == 0);
-        stubGeoDetIdMap_[stackDetid] = detid;
+        assert(stubGeoDetIdMap.count(stackDetid) == 0);
+        stubGeoDetIdMap[stackDetid] = detid;
       }
     }
-    assert(lStubDetIds.size() == stubGeoDetIdMap_.size());
-
-    for (DetSetVec::const_iterator p_module = ttStubHandle->begin(); p_module != ttStubHandle->end(); p_module++) {
-      for (DetSet::const_iterator p_ttstub = p_module->begin(); p_ttstub != p_module->end(); p_ttstub++) {
-        TTStubRef ttStubRef = edmNew::makeRefTo(ttStubHandle, p_ttstub);
-        // Store the Stub info, using class Stub to provide easy access to the most useful info.
-        Stub stub(ttStubRef, settings, trackerGeometry, trackerTopology);
-        // Also fill truth associating stubs to tracking particles.
-        //      stub.fillTruth(vTPs_, mcTruthTTStubHandle, mcTruthTTClusterHandle);
-        stub.fillTruth(translateTP_, mcTruthTTStubHandle, mcTruthTTClusterHandle);
-        vAllStubs_.push_back(stub);
-      }
-    }
-
-    std::map<const TP*, std::vector<const Stub*>> tpStubMap;
-    for (const TP& tp : vTPs_)
-      tpStubMap[&tp] = std::vector<const Stub*>();
-    for (const Stub& stub : vAllStubs_) {
-      for (const TP* tp : stub.assocTPs()) {
-        tpStubMap[tp].push_back(&stub);
-      }
-    }
+    assert(lStubDetIds.size() == stubGeoDetIdMap.size());
 
     // Find the various vertices
-    for (unsigned int j = 0; j < vTPs_.size(); j++) {
-      assert(tpStubMap.count(&vTPs_.at(j)) == 1);
-      vTPs_[j].setMatchingStubs(tpStubMap.find(&vTPs_.at(j))->second);
-      if (vTPs_[j].useForAlgEff()) {
-        vertex_.insert(vTPs_[j]);
-      } else if (vTPs_[j].useForVertexReco()) {
+    for (const auto& [edmPtr, edmRef] : tpPtrToRefMap_) {
+      TP tp = (*tpValueMapHandle)[edmRef];
+      if (tp.useForAlgEff()) {
+        vertex_.insert(tp);
+      } else if (tp.useForVertexReco()) {
         bool found = false;
         for (unsigned int i = 0; i < vertices_.size(); ++i) {
-          if (vTPs_[j]->vz() == vertices_[i].vz()) {
-            vertices_[i].insert(vTPs_[j]);
+          if (tp->vz() == vertices_[i].vz()) {
+            vertices_[i].insert(tp);
             found = true;
             break;
           }
         }
         if (!found) {
-          Vertex vertex(vTPs_[j]->vz());
-          vertex.insert(vTPs_[j]);
+          Vertex vertex(tp->vz());
+          vertex.insert(tp);
           vertices_.push_back(vertex);
         }
       }
