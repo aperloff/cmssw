@@ -55,8 +55,6 @@ private:
 
   // ----------constants, enums and typedefs ---------
   typedef edmNew::DetSetVector<TTStub<Ref_Phase2TrackerDigi_>> DetSetVec;
-  typedef TTStubAssociationMap<Ref_Phase2TrackerDigi_> TTStubAssMap;
-  typedef TTClusterAssociationMap<Ref_Phase2TrackerDigi_> TTClusterAssMap;
 
   // ----------member data ---------------------------
   const std::string outputCollectionName_;
@@ -67,8 +65,6 @@ private:
   const edm::EDGetTokenT<edm::ValueMap<l1tVertexFinder::TP>> tpValueMapToken_;
   const edm::EDGetTokenT<DetSetVec> stubToken_;
   const edm::EDGetTokenT<edm::ValueMap<l1tVertexFinder::Stub>> stubValueMapToken_;
-  const edm::EDGetTokenT<TTStubAssMap> stubTruthToken_;
-  const edm::EDGetTokenT<TTClusterAssMap> clusterTruthToken_;
 };
 
 //
@@ -82,10 +78,7 @@ InputDataProducer::InputDataProducer(const edm::ParameterSet& iConfig)
         consumes<edm::View<reco::GenParticle>>(iConfig.getParameter<edm::InputTag>("genParticleInputTag"))),
     tpToken_(consumes<edm::View<TrackingParticle>>(iConfig.getParameter<edm::InputTag>("tpInputTag"))),
     tpValueMapToken_(consumes<edm::ValueMap<l1tVertexFinder::TP>>(iConfig.getParameter<edm::InputTag>("tpValueMapInputTag"))),
-    stubToken_(consumes<DetSetVec>(iConfig.getParameter<edm::InputTag>("stubInputTag"))),
-    stubValueMapToken_(consumes<edm::ValueMap<l1tVertexFinder::Stub>>(iConfig.getParameter<edm::InputTag>("stubValueMapInputTag"))),
-    stubTruthToken_(consumes<TTStubAssMap>(iConfig.getParameter<edm::InputTag>("stubTruthInputTag"))),
-    clusterTruthToken_(consumes<TTClusterAssMap>(iConfig.getParameter<edm::InputTag>("clusterTruthInputTag"))) {
+    stubToken_(consumes<DetSetVec>(iConfig.getParameter<edm::InputTag>("stubInputTag"))) {
 
   // Define EDM output to be written to file (if required)
   produces<l1tVertexFinder::InputData>(outputCollectionName_);
@@ -110,10 +103,7 @@ void InputDataProducer::produce(edm::StreamID, edm::Event& iEvent, const edm::Ev
                                                                                                      genParticlesToken_,
                                                                                                      tpToken_,
                                                                                                      tpValueMapToken_,
-                                                                                                     stubToken_,
-                                                                                                     stubValueMapToken_,
-                                                                                                     stubTruthToken_,
-                                                                                                     clusterTruthToken_);
+                                                                                                     stubToken_);
 
   iEvent.put(std::move(product), outputCollectionName_);
 }

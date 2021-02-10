@@ -19,6 +19,7 @@
 //
 
 // system include files
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
@@ -61,8 +62,6 @@ private:
 
   // ----------constants, enums and typedefs ---------
   typedef edm::Ptr<TrackingParticle> TrackingParticlePtr;
-  typedef edm::Ref<edmNew::DetSetVector<TTCluster<Ref_Phase2TrackerDigi_>>, TTCluster<Ref_Phase2TrackerDigi_>>
-      TTClusterRef;
   typedef edmNew::DetSet<TTStub<Ref_Phase2TrackerDigi_>> DetSet;
   typedef edmNew::DetSetVector<TTStub<Ref_Phase2TrackerDigi_>> DetSetVec;
   typedef edm::Ref<DetSetVec, TTStub<Ref_Phase2TrackerDigi_>> TTStubRef;
@@ -94,15 +93,9 @@ TPStubValueMapProducer::TPStubValueMapProducer(const edm::ParameterSet& iConfig)
 
   // Define EDM output to be written to file (if required)
   produces<TrackingParticleCollection>();
-  produces<std::vector<l1tVertexFinder::TP>>(outputCollectionNames_[0]);
   produces<edm::ValueMap<l1tVertexFinder::TP>>(outputCollectionNames_[0]);
-  produces<edm::ValueMap<edm::Ptr<l1tVertexFinder::TP>>>(outputCollectionNames_[0]);
-  produces<std::vector<l1tVertexFinder::TP>>(outputCollectionNames_[1]);
-  produces<std::vector<l1tVertexFinder::Stub>>(outputCollectionNames_[2]);
-  produces<edm::ValueMap<l1tVertexFinder::Stub>>(outputCollectionNames_[2]);
-  produces<edm::ValueMap<edm::Ptr<l1tVertexFinder::Stub>>>(outputCollectionNames_[2]);
-
-  //now do what ever other initialization is needed
+  produces<edm::ValueMap<l1tVertexFinder::TP>>(outputCollectionNames_[1]);
+  produces<std::vector<l1tVertexFinder::TP>>(outputCollectionNames_[2]);
 }
 
 TPStubValueMapProducer::~TPStubValueMapProducer()
@@ -131,7 +124,9 @@ void TPStubValueMapProducer::produce(edm::StreamID, edm::Event& iEvent, const ed
   // Produce the vector of TP for the edm::Ref<TrackingParticle>->TP value map
   unsigned int nTP = tpHandle->size();
   auto vTPs = std::make_unique<std::vector<l1tVertexFinder::TP>>();
+  auto vTPsUse = std::make_unique<std::vector<l1tVertexFinder::TP>>();
   vTPs->reserve(nTP);
+  vTPsUse->reserve(nTP);
   std::set<edm::Ptr<TrackingParticle>> sTPs;
   for (unsigned int i = 0; i < nTP; i++) {
     TrackingParticlePtr tpPtr(tpHandle, i);
@@ -141,19 +136,16 @@ void TPStubValueMapProducer::produce(edm::StreamID, edm::Event& iEvent, const ed
     // Also create map relating edm::Ptr<TrackingParticle> to TP.
     if (tp.use()) {
       vTrackingParticles->push_back(tpHandle->at(i));
-      vTPs->push_back(tp);
+      vTPsUse->push_back(tp);
       sTPs.insert(tpPtr);
     }
+    vTPs->push_back(tp);
   }
 
-  std::set<edm::Ptr<TrackingParticle>> allMatchedTPs;
+  auto vAllMatchedTPs = std::make_unique<std::vector<l1tVertexFinder::TP>>(*vTPsUse);
   for (auto& entry : mcTruthTTTrackHandle->getTTTrackToTrackingParticleMap()) {
-    allMatchedTPs.insert(entry.second);
-  }
-  auto vAllMatchedTPs = std::make_unique<std::vector<l1tVertexFinder::TP>>(*vTPs);
-  for (auto& tpPtr : allMatchedTPs) {
-    if (sTPs.count(tpPtr) == 0) {
-      vAllMatchedTPs->push_back(l1tVertexFinder::TP(tpPtr, settings_));
+    if (sTPs.count(entry.second) == 0) {
+      vAllMatchedTPs->push_back(l1tVertexFinder::TP(entry.second, settings_));
     }
   }
 
@@ -196,53 +188,24 @@ void TPStubValueMapProducer::produce(edm::StreamID, edm::Event& iEvent, const ed
   }
 
   //Put the products into the event
-  // Modeled after: https://github.com/cms-sw/cmssw/blob/ba6e8604a35283e39e89bc031766843d0afc3240/PhysicsTools/SelectorUtils/interface/VersionedIdProducer.h
+  // Modeled after: https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/SelectorUtils/interface/VersionedIdProducer.h
 
   // Collections of products
   auto vTrackingParticlesHandle = iEvent.put(std::move(vTrackingParticles));
-  auto vTPsHandle = iEvent.put(std::move(vTPs), outputCollectionNames_[0]);
-  auto vAllMatchedTPsHandle = iEvent.put(std::move(vAllMatchedTPs), outputCollectionNames_[1]);
-  auto vAllStubsHandle = iEvent.put(std::move(vAllStubs), outputCollectionNames_[2]);
+  auto vAllMatchedTPsHandle = iEvent.put(std::move(vAllMatchedTPs), outputCollectionNames_[2]);
 
   // Value maps to TP/Stub
   auto TPV = std::make_unique<edm::ValueMap<l1tVertexFinder::TP>>();
   edm::ValueMap<l1tVertexFinder::TP>::Filler fillerTP(*TPV);
-  fillerTP.insert(vTrackingParticlesHandle, vTPs->begin(), vTPs->end());
+  fillerTP.insert(tpHandle, vTPs->begin(), vTPs->end());
   fillerTP.fill();
   iEvent.put(std::move(TPV), outputCollectionNames_[0]);
 
-  auto StubV = std::make_unique<edm::ValueMap<l1tVertexFinder::Stub>>();
-  edm::ValueMap<l1tVertexFinder::Stub>::Filler fillerStub(*StubV);
-  fillerStub.insert(vTrackingParticlesHandle, vAllStubs->begin(), vAllStubs->end());
-  fillerStub.fill();
-  iEvent.put(std::move(StubV), outputCollectionNames_[2]);
-
-
-  // Convert from handle to edm::Ptr<T> where T=[TP or Stub]
-  auto out_vTPptrs = std::make_unique<edm::ValueMap<edm::Ptr<l1tVertexFinder::TP>>>();
-  std::vector<edm::Ptr<l1tVertexFinder::TP>> vTPptrs;
-  vTPptrs.reserve(vTPs->size());
-  for (unsigned i = 0; i < vTPsHandle->size(); ++i) {
-    vTPptrs.push_back(edm::Ptr<l1tVertexFinder::TP>(vTPsHandle, i));
-  }
-
-  auto out_vAllStubptrs = std::make_unique<edm::ValueMap<edm::Ptr<l1tVertexFinder::Stub>>>();
-  std::vector<edm::Ptr<l1tVertexFinder::Stub>> vAllStubptrs;
-  vAllStubptrs.reserve(vAllStubs->size());
-  for (unsigned i = 0; i < vAllStubsHandle->size(); ++i) {
-    vAllStubptrs.push_back(edm::Ptr<l1tVertexFinder::Stub>(vAllStubsHandle, i));
-  }
-
-  // Value maps of edm::Ptr<T> where T=[TP or Stub]
-  edm::ValueMap<edm::Ptr<l1tVertexFinder::TP>>::Filler fillerTPptrs(*out_vTPptrs);
-  fillerTPptrs.insert(vTrackingParticlesHandle, vTPptrs.begin(), vTPptrs.end());
-  fillerTPptrs.fill();
-  iEvent.put(std::move(out_vTPptrs), outputCollectionNames_[0]);
-
-  edm::ValueMap<edm::Ptr<l1tVertexFinder::Stub>>::Filler fillerStubptrs(*out_vAllStubptrs);
-  fillerStubptrs.insert(ttStubHandle, vAllStubptrs.begin(), vAllStubptrs.end());
-  fillerStubptrs.fill();
-  iEvent.put(std::move(out_vAllStubptrs), outputCollectionNames_[2]);
+  auto TPuseV = std::make_unique<edm::ValueMap<l1tVertexFinder::TP>>();
+  edm::ValueMap<l1tVertexFinder::TP>::Filler fillerTPuse(*TPuseV);
+  fillerTPuse.insert(vTrackingParticlesHandle, vTPsUse->begin(), vTPsUse->end());
+  fillerTPuse.fill();
+  iEvent.put(std::move(TPuseV), outputCollectionNames_[1]);
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------

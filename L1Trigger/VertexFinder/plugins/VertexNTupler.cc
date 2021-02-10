@@ -517,9 +517,9 @@ namespace l1tVertexFinder {
         if (matchedTP.isNull())
           branchData.truthMapMatchIdx.push_back(-1);
         else {
-          auto it = std::find_if(std::begin(*allMatchedTPsHandle), std::end(*allMatchedTPsHandle), [&matchedTP] (auto const& tp) { return tp.getTrackingParticle() == matchedTP; });
-          assert(it != std::end(*allMatchedTPsHandle));
-          branchData.truthMapMatchIdx.push_back(std::distance(std::begin(*allMatchedTPsHandle), it));
+          auto it = std::find_if(allMatchedTPsHandle->begin(), allMatchedTPsHandle->end(), [&matchedTP] (auto const& tp) { return tp.getTrackingParticle() == matchedTP; });
+          assert(it != allMatchedTPsHandle->end());
+          branchData.truthMapMatchIdx.push_back(std::distance(allMatchedTPsHandle->begin(), it));
         }
         branchData.truthMapIsGenuine.push_back(truthAssocMap.isGenuine(track.getTTTrackPtr()) ? 1.0 : 0.0);
         branchData.truthMapIsLooselyGenuine.push_back(truthAssocMap.isLooselyGenuine(track.getTTTrackPtr()) ? 1.0

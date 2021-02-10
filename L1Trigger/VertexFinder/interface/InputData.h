@@ -33,10 +33,7 @@ namespace l1tVertexFinder {
               const edm::EDGetTokenT<edm::View<reco::GenParticle>> genParticlesToken,
               const edm::EDGetTokenT<edm::View<TrackingParticle>> tpToken,
               const edm::EDGetTokenT<edm::ValueMap<l1tVertexFinder::TP>> tpValueMapToken,
-              const edm::EDGetTokenT<DetSetVec> stubToken,
-              const edm::EDGetTokenT<edm::ValueMap<l1tVertexFinder::Stub>> stubValueMapToken,
-              const edm::EDGetTokenT<TTStubAssMap> stubTruthToken,
-              const edm::EDGetTokenT<TTClusterAssMap> clusterTruthToken);
+              const edm::EDGetTokenT<DetSetVec> stubToken);
     ~InputData();
 
     // Sort Tracking Particles by vertex z position

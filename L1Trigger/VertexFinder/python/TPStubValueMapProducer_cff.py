@@ -4,7 +4,7 @@ from L1Trigger.VertexFinder.VertexProducer_cff import VertexProducer
 
 TPStubValueMapProducer = cms.EDProducer('TPStubValueMapProducer',
   #=== The name of the output collection
-  outputCollectionNames = cms.vstring("TPs","allMatchedTPs","Stubs"),
+  outputCollectionNames = cms.vstring("TPs","TPsUse","allMatchedTPs"),
   
   #=== Cuts on MC truth particles (i.e., tracking particles) used for tracking efficiency measurements.
   GenCuts = L1TVertexNTupler.GenCuts,

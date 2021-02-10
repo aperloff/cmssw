@@ -21,13 +21,9 @@ InputDataProducer = cms.EDProducer('InputDataProducer',
   #=== Input collections
   hepMCInputTag = cms.InputTag("generatorSmeared","","SIM"),
   genParticleInputTag = cms.InputTag("genParticles",""),
-  #tpInputTag = cms.InputTag("mix", "MergedTrackTruth"),
-  tpInputTag = cms.InputTag("TPStubValueMapProducer"),
+  tpInputTag = cms.InputTag("mix", "MergedTrackTruth"),
   tpValueMapInputTag = cms.InputTag("TPStubValueMapProducer:TPs"),
   stubInputTag = cms.InputTag("TTStubsFromPhase2TrackerDigis", "StubAccepted"),
-  stubValueMapInputTag = cms.InputTag("TPStubValueMapProducer:Stubs"),
-  stubTruthInputTag = cms.InputTag("TTStubAssociatorFromPixelDigis", "StubAccepted"),
-  clusterTruthInputTag = cms.InputTag("TTClusterAssociatorFromPixelDigis", "ClusterAccepted"),
 
   #=== Debug printout
   debug = L1TVertexNTupler.debug,

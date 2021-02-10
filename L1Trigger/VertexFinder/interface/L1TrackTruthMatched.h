@@ -25,7 +25,7 @@ namespace l1tVertexFinder {
   class L1TrackTruthMatched : public L1Track {
   public:
     L1TrackTruthMatched(const edm::Ptr<TTTrack<Ref_Phase2TrackerDigi_>>& aTrack,
-                        const std::map<edm::Ptr<TrackingParticle>, edm::RefToBase<TrackingParticle>> & tpPtrToRefMap,
+                        const std::map<edm::Ptr<TrackingParticle>, edm::RefToBase<TrackingParticle>>& tpPtrToRefMap,
                         const edm::ValueMap<TP>& tpValueMap,
                         edm::Handle<TTTrackAssMap> mcTruthTTTrackHandle)
         : L1Track(aTrack), matchedTPidx_(-1) {

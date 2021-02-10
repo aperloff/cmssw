@@ -28,34 +28,7 @@ namespace l1tVertexFinder {
                        const edm::EDGetTokenT<edm::View<reco::GenParticle>> genParticlesToken,
                        const edm::EDGetTokenT<edm::View<TrackingParticle>> tpToken,
                        const edm::EDGetTokenT<edm::ValueMap<l1tVertexFinder::TP>> tpValueMapToken,
-                       const edm::EDGetTokenT<DetSetVec> stubToken,
-                       const edm::EDGetTokenT<edm::ValueMap<l1tVertexFinder::Stub>> stubValueMapToken,
-                       const edm::EDGetTokenT<TTStubAssMap> stubTruthToken,
-                       const edm::EDGetTokenT<TTClusterAssMap> clusterTruthToken) {
-    // Get TrackingParticle info
-    edm::Handle<edm::View<TrackingParticle>> tpHandle;
-    edm::Handle<edm::ValueMap<TP>> tpValueMapHandle;
-    iEvent.getByToken(tpToken, tpHandle);
-    iEvent.getByToken(tpValueMapToken, tpValueMapHandle);
-
-    genPt_ = 0.;
-    genPt_PU_ = 0.;
-    for (unsigned int i = 0; i < tpHandle->size(); i++) {
-      TrackingParticlePtr tpPtr(tpHandle, i);
-      auto tpRef = tpHandle->refAt(i);
-      TP tp = (*tpValueMapHandle)[tpRef];
-      tpPtrToRefMap_[tpPtr] = tpRef;
-
-      if (tp.physicsCollision()) {
-        genPt_ += tp->pt();
-      } else {
-        genPt_PU_ += tp->pt();
-      }      
-    }
-
-    if (settings.debug() > 0) {
-      edm::LogInfo("InputData") << "InputData::genPt in the event " << genPt_;
-    }
+                       const edm::EDGetTokenT<DetSetVec> stubToken) {
 
     // Get the tracker geometry info needed to unpack the stub info.
     edm::ESHandle<TrackerGeometry> trackerGeometryHandle;
@@ -69,11 +42,7 @@ namespace l1tVertexFinder {
     // Get stub info, by looping over modules and then stubs inside each module.
     // Also get the association map from stubs to tracking particles.
     edm::Handle<DetSetVec> ttStubHandle;
-    edm::Handle<TTStubAssMap> mcTruthTTStubHandle;
-    edm::Handle<TTClusterAssMap> mcTruthTTClusterHandle;
     iEvent.getByToken(stubToken, ttStubHandle);
-    iEvent.getByToken(stubTruthToken, mcTruthTTStubHandle);
-    iEvent.getByToken(clusterTruthToken, mcTruthTTClusterHandle);
 
     std::set<DetId> lStubDetIds;
     for (DetSetVec::const_iterator p_module = ttStubHandle->begin(); p_module != ttStubHandle->end(); p_module++) {
@@ -98,9 +67,33 @@ namespace l1tVertexFinder {
     }
     assert(lStubDetIds.size() == stubGeoDetIdMap.size());
 
+    // Get TrackingParticle info
+    edm::Handle<edm::View<TrackingParticle>> tpHandle;
+    edm::Handle<edm::ValueMap<TP>> tpValueMapHandle;
+    iEvent.getByToken(tpToken, tpHandle);
+    iEvent.getByToken(tpValueMapToken, tpValueMapHandle);
+    edm::ValueMap<TP> tpValueMap = *tpValueMapHandle;
+
+    for (unsigned int i = 0; i < tpHandle->size(); i++) {
+      if (tpValueMap[tpHandle->refAt(i)].use()) {
+        tpPtrToRefMap_[tpHandle->ptrAt(i)] = tpHandle->refAt(i);
+      }
+    }
+
     // Find the various vertices
+    genPt_ = 0.;
+    genPt_PU_ = 0.;
     for (const auto& [edmPtr, edmRef] : tpPtrToRefMap_) {
-      TP tp = (*tpValueMapHandle)[edmRef];
+      TP tp = tpValueMap[edmRef];
+      if (tp.physicsCollision()) {
+        genPt_ += tp->pt();
+      } else {
+        genPt_PU_ += tp->pt();
+      }
+      if (settings.debug() > 0) {
+        edm::LogInfo("InputData") << "InputData::genPt in the event " << genPt_;
+      }
+
       if (tp.useForAlgEff()) {
         vertex_.insert(tp);
       } else if (tp.useForVertexReco()) {
